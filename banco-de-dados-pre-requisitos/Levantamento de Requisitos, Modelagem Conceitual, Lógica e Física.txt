@@ -1,0 +1,87 @@
+Levantamento de Requisitos
+
+O processo de levantamento de requisitos normalmente passa por etapas como:
+
+1. Contexto do Projeto
+
+Qual é o problema que o sistema deve resolver?   Indisponibilidade de hardware e computadores para compra
+
+Quem são os usuários finais?  os clientes
+
+Qual é o objetivo principal do sistema?  Vender hardware para computadores
+
+2. Atores/Stakeholders
+
+Cliente: acessa a plataforma, consulta produtos e realiza compras.
+
+Administrador/Loja: cadastra produtos, controla estoque e acompanha pedidos.
+
+Fornecedor (opcional): responsável por repor o estoque da loja.
+
+3. Requisitos Funcionais (exemplos iniciais)
+
+RF01: Permitir cadastro de clientes.
+
+RF02: Exibir catálogo de hardware disponível.
+
+RF03: Realizar compra de produtos (carrinho de compras).
+
+RF04: Emitir confirmação de pedido e forma de pagamento.
+
+RF05: Administrador pode cadastrar, editar e excluir produtos.
+
+RF06: Administrador acompanha vendas e relatórios.
+
+4. Requisitos Não Funcionais (exemplos iniciais)
+
+RNF01: O sistema deve estar disponível 24/7.
+
+RNF02: O tempo de resposta de cada requisição deve ser inferior a 2 segundos.
+
+RNF03: O sistema deve ser responsivo (acessível em computador e celular).
+
+RNF04: O sistema deve utilizar autenticação segura para clientes e administradores.
+
+5. Regras de Negócio (iniciais)
+
+RN01: O cliente só pode comprar se estiver com cadastro ativo.
+
+RN02: O estoque deve ser atualizado automaticamente a cada venda.
+
+RN03: Produtos esgotados não podem ser vendidos.
+
+6. Casos de Uso / Histórias de Usuário (iniciais)
+
+Cliente:
+
+Como cliente, quero pesquisar peças de hardware para encontrar o produto ideal.
+
+Como cliente, quero adicionar produtos ao carrinho para comprá-los de uma só vez.
+
+Como cliente, quero pagar com cartão ou boleto para concluir minha compra.
+
+Administrador:
+
+Como administrador, quero cadastrar novos produtos para manter o catálogo atualizado.
+
+Como administrador, quero gerar relatórios de vendas para acompanhar o desempenho da loja.
+
+Modelo Conceitual
+
+
+
+
+
+Modelo Lógico
+
+
+
+
+
+Modelo Físico
+
+
+
+
+
+
