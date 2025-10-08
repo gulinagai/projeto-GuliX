@@ -1,9 +1,10 @@
 import React from 'react'
 
-const SearchIcon = () => {
+const SearchIcon = ({ styles }) => {
   return (
     <>
         <svg 
+        className={styles}
         version="1.0" 
         xmlns="http://www.w3.org/2000/svg"
         width="22.000000pt" 
@@ -11,7 +12,7 @@ const SearchIcon = () => {
         viewBox="0 0 512.000000 512.000000"
         preserveAspectRatio="xMidYMid meet">
         <g transform="translate(0.000000,512.000000) scale(0.100000,-0.100000)"
-        fill="#fafafa" stroke="none">
+        stroke="none">
             <path d="M1865 5114 c-207 -20 -364 -52 -522 -108 -712 -248 -1212 -860 -1324
             -1621 -19 -126 -16 -433 5 -564 69 -437 262 -820 564 -1118 386 -383 873 -583
             1417 -583 377 0 764 111 1065 306 39 25 73 44 74 42 1 -1 11 -25 21 -53 10

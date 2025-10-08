@@ -1,8 +1,8 @@
 import React from 'react';
-import Home from './components/home/Home'
+import Home from './components/pages/home/Home'
 import Header from './components/header/Header';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import ProdutosPage from './components/pages/ProdutosPage';
+import ProdutosPage from './components/pages/produtos/ProdutosPage';
 
 const App = ()=> {
 
@@ -15,7 +15,7 @@ const App = ()=> {
             <Route path='/' element={<Home />}></Route>
           </Routes>
           <Routes>
-            <Route path='/produtos' element={<ProdutosPage />}></Route>
+            <Route path='/hardware' element={<ProdutosPage />}></Route>
           </Routes>
         </BrowserRouter>
       </div>
