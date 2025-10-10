@@ -1,7 +1,7 @@
 const express = require("express")
 const cors = require("cors")
-
 const app = express()
+const path = require('path')
 
 const PORT  = 3000;
 
@@ -17,6 +17,8 @@ app.use(cors()) //
 // isso restringe o acesso a apenas a essa origem/porta
 
 // como estou fazendo o fetch pelo front que está vite, rodando em uma outra porta (5173), o navegador automaticamente bloqueia o acesso a API.
+
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')))
 
 app.get('/', (req, res)=> {
     res.send('Servidor Node Express rodando :)') // envia a resposta http ao cliente, contém Status (por padrão 200 OK, a não ser que você troque com res.status(404) etc,Headers (por exemplo, Content-Type: application/json quando usa res.json) e Body (o conteúdo em si — JSON, texto, HTML, etc).
