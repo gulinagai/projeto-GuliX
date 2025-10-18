@@ -18,7 +18,7 @@ app.use(cors()) //
 
 // como estou fazendo o fetch pelo front que está vite, rodando em uma outra porta (5173), o navegador automaticamente bloqueia o acesso a API.
 
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')))
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')))  // expoe os dados da pasta uploads via URL publica, como (mas não é um webservice, apesar de ter um endpoint)
 
 app.get('/', (req, res)=> {
     res.send('Servidor Node Express rodando :)') // envia a resposta http ao cliente, contém Status (por padrão 200 OK, a não ser que você troque com res.status(404) etc,Headers (por exemplo, Content-Type: application/json quando usa res.json) e Body (o conteúdo em si — JSON, texto, HTML, etc).
