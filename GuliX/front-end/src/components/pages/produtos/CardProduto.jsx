@@ -1,4 +1,5 @@
 import React from 'react'
+import { Link } from 'react-router-dom'
 
 const CardProduto = ({ data, index }) => {
   console.log(data[1].imagem_url)
@@ -14,7 +15,7 @@ const CardProduto = ({ data, index }) => {
 
       <div className="p-4 flex flex-col gap-3">
         <h2 className="flex-1 text-lg font-semibold text-[#4983e0]">
-          {`${data[index].nome}, ${data[index].resumo}`}
+          <Link to={`${data[index].imagem_url}`}>{`${data[index].nome}, ${data[index].resumo}`}</Link>
         </h2>
         <div className='mt-auto'>
           <span className="w-full text-xl font-bold text-[#2454a3]">{`R$ ${data[index].preco.replace(/\./, ',')}`}</span>
