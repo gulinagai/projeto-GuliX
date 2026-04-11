@@ -2,7 +2,6 @@ import React from 'react'
 import { Link } from 'react-router-dom'
 
 const CardProduto = ({ data, index }) => {
-  console.log(data[1].imagem_url)
   return (
    <div className="max-w-[250px] h-[500px] rounded-2xl shadow-md hover:shadow-xl transition-shadow duration-300 overflow-hidden grid grid-rows-[40%_60%] border-[1px] border-[#ffffff50] bg-[#0d0d0d]">
       <div className="h-48 flex items-center justify-center border-b-[1px] border-[#ffffff50] bg-[#ffffff]">
