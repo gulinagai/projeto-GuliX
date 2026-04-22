@@ -1,4 +1,4 @@
 package guli.gulix.backend.dto;
 
-public class ProdutoDTO {
+public class ProdutoDTORequest {
 }

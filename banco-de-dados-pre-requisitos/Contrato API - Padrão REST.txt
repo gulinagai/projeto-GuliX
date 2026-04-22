@@ -1,0 +1,20 @@
+GET     /api/v1/produtos                - listar todos produtos.
+GET     /api/v1/produtos/{id}           - buscar produto por id
+POST    /api/v1/produtos                - criar produto novo
+PUT     /api/v1/produtos/{id}           - atualizar produto completamente 
+PATCH   /api/v1/produtos/{id}           - atualizar produto parcialmente
+DELETE  /api/v1/produtos/{id}           - deletar produto específico
+
+
+GET /api/v1/pedidos                    - listar pedidos (filtrável por usuarioId)
+GET /api/v1/pedidos/{id}               - buscar pedido por id (validando dono)
+POST /api/v1/pedidos                   - criar novo pedido para um usuário 
+PATCH /api/v1/pedidos/{id}/status      - atualizar parcialmente pedido (status)
+
+
+GET     /api/v1/usuarios              - listar todos usuarios.
+GET     /api/v1/usuarios/{id}           - buscar usuario por id
+POST    /api/v1/usuarios                - criar usuario novo
+PUT     /api/v1/usuarios/{id}           - atualizar usuario completamente 
+PATCH   /api/v1/usuarios/{id}           - atualizar usuario parcialmente
+DELETE  /api/v1/usuarios/{id}           - deletar usuario específico (desativar)
