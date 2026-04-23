@@ -1,6 +1,9 @@
 package guli.gulix.backend.controller;
 
+import guli.gulix.backend.dto.ProdutoCreateDTO;
+import guli.gulix.backend.dto.ProdutoResponseDTO;
 import guli.gulix.backend.entity.Produto;
+import guli.gulix.backend.mapper.ProdutoMapper;
 import guli.gulix.backend.repository.ProdutoRepository;
 import guli.gulix.backend.service.ProdutoService;
 import lombok.RequiredArgsConstructor;
@@ -17,6 +20,7 @@ import java.util.List;
 @RequestMapping("/api/v1/produtos")
 public class ProdutoController {
     private final ProdutoService produtoService;
+    private final ProdutoMapper produtoMapper;
 
     @GetMapping
     public ResponseEntity<List<Produto>> getAllProduto() {
@@ -30,15 +34,18 @@ public class ProdutoController {
     }
 
     @PostMapping
-    public ResponseEntity<Produto> createNewProduto(@RequestBody Produto produto) {
+    public ResponseEntity<ProdutoResponseDTO> createNewProduto(@RequestBody ProdutoCreateDTO produtoRequest) {
 
-        Produto novoProduto = produtoService.createNewProduto(produto);
+        Produto novoProduto = produtoService.createNewProduto(produtoRequest);
 
         HttpHeaders headers = new HttpHeaders();
 
         headers.add("Location", "/api/v1/beer/" + novoProduto.getId().toString());
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(novoProduto);
+        ProdutoResponseDTO response = produtoMapper.toDTO(novoProduto);
+
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
 
@@ -57,6 +64,12 @@ public class ProdutoController {
         return ResponseEntity.ok(produtoAtualizado);
     }
 
+    @PatchMapping("/{produtoId}")
+    public ResponseEntity<Produto> updatePartialProdutoById(@PathVariable("produtoId") Integer produtoId, @RequestBody Produto produtoParcial) {
 
+       Produto produtoAtualizado = produtoService.updatePartialProdutoById(produtoId, produtoParcial);
+
+       return ResponseEntity.ok(produtoAtualizado);
+    }
 
 }

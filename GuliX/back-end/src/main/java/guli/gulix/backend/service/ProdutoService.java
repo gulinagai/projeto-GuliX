@@ -1,5 +1,6 @@
 package guli.gulix.backend.service;
 
+import guli.gulix.backend.dto.ProdutoCreateDTO;
 import guli.gulix.backend.entity.Produto;
 
 import java.util.List;
@@ -10,9 +11,11 @@ public interface ProdutoService {
 
     Produto getProdutoById(Integer produtoId);
 
-    Produto createNewProduto(Produto produto);
+    Produto createNewProduto(ProdutoCreateDTO produtoRequest);
 
     void deleteProdutoById(Integer produtoId);
 
     Produto updateProdutoById(Integer produtoId, Produto produto);
+
+    Produto updatePartialProdutoById(Integer produtoId, Produto produtoParcial);
 }

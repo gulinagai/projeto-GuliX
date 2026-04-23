@@ -26,9 +26,6 @@ public class Produto {
     private BigDecimal preco;
     private Long estoque;
 
-    @Column(name = "categoria_id")
-    private Integer categoriaId;
-
     @Column(name = "imagem_url")
     private String imagemURL;
 
@@ -40,8 +37,11 @@ public class Produto {
     @Column(name = "atualizado_em")
     private LocalDateTime atualizadoEm;
 
+    @Column(name = "categoria_id")
+    private Categoria categoria;
+
     @Column(name = "marca_id")
-    private Integer marcaId;
+    private Marca marca;
     private Boolean destaque;
 
     private BigDecimal desconto;
