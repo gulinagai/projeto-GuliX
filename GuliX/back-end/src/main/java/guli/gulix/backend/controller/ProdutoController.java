@@ -28,9 +28,9 @@ public class ProdutoController {
     }
 
     @GetMapping("/{produtoId}")
-    public ResponseEntity<Produto> getProdutoById(@PathVariable("produtoId") Integer produtoId) {
+    public ResponseEntity<ProdutoResponseDTO> getProdutoById(@PathVariable("produtoId") Integer produtoId) {
         Produto produto = produtoService.getProdutoById(produtoId);
-        return ResponseEntity.ok(produto);
+        return ResponseEntity.ok(produtoMapper.toDTO(produto));
     }
 
     @PostMapping
