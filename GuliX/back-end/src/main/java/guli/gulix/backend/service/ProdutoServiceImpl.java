@@ -1,6 +1,8 @@
 package guli.gulix.backend.service;
 
 import guli.gulix.backend.dto.ProdutoCreateDTO;
+import guli.gulix.backend.dto.ProdutoResponseDTO;
+import guli.gulix.backend.dto.ProdutoUpdateDTO;
 import guli.gulix.backend.entity.Categoria;
 import guli.gulix.backend.entity.Marca;
 import guli.gulix.backend.entity.Produto;
@@ -76,29 +78,52 @@ public class ProdutoServiceImpl implements ProdutoService {
     }
 
     @Override
-    public Produto updateProdutoById(Integer produtoId, Produto produtoAtualizar) {
+    public Produto updateProdutoById(Integer produtoId, ProdutoUpdateDTO produtoAtualizar) {
+
         Produto produto = produtoRepository.findById(produtoId)
                 .orElseThrow(()->
                         new RecursoNaoEncontradoException(
                                 "Produto com id " + produtoId + " não encontrado"
                         ));
 
-        produto.setNome(produtoAtualizar.getNome());
-        produto.setResumo(produtoAtualizar.getResumo());
-        produto.setPreco(produtoAtualizar.getPreco());
-        produto.setEstoque(produtoAtualizar.getEstoque());
-        produto.setCategoriaId(produtoAtualizar.getCategoriaId());
-        produto.setImagemURL(produtoAtualizar.getImagemURL());
-        produto.setMarcaId(produtoAtualizar.getMarcaId());
-        produto.setDestaque(produtoAtualizar.getDestaque());
-        produto.setDesconto(produtoAtualizar.getDesconto());
+        produtoMapper.updateFromDto(produtoAtualizar, produto); // o Mapstruct gera todos os sets automaticamente! atualiza o que tiver para atualizar no objeto
+        // basta gravar no banco
+        // o fato de existir metodo no mapper tratando update, representa exatamente o que seria feito abaixo manualmente:
+
+//        produto.setNome(produtoAtualizar.getNome());
+//        produto.setResumo(produtoAtualizar.getResumo());
+//        produto.setPreco(produtoAtualizar.getPreco());
+//        produto.setEstoque(produtoAtualizar.getEstoque());
+//        produto.setCategoriaId(produtoAtualizar.getCategoriaId());
+//        produto.setImagemURL(produtoAtualizar.getImagemURL());
+//        produto.setMarcaId(produtoAtualizar.getMarcaId());
+//        produto.setDestaque(produtoAtualizar.getDestaque());
+//        produto.setDesconto(produtoAtualizar.getDesconto());
+
+        if(produtoAtualizar.getCategoriaId() != null) {
+            Categoria categoria = categoriaRepository.findById(produtoAtualizar.getCategoriaId())
+                    .orElseThrow(()->
+                            new RecursoNaoEncontradoException(
+                                    "Categoria com id " + produtoAtualizar.getCategoriaId() + " não encontrado"
+                            ));
+            produto.setCategoria(categoria);
+        }
+
+        if(produtoAtualizar.getMarcaId() != null) {
+            Marca marca = marcaRepository.findById(produtoAtualizar.getMarcaId())
+                    .orElseThrow(()->
+                            new RecursoNaoEncontradoException(
+                                    "Marca com id " + produtoAtualizar.getMarcaId() + " não encontrado"
+                            ));
+            produto.setMarca(marca);
+        }
 
         return produtoRepository.save(produto);
 
     }
 
     @Override
-    public Produto updatePartialProdutoById(Integer produtoId, Produto produtoParcial) {
+    public Produto updatePartialProdutoById(Integer produtoId, ProdutoUpdateDTO produtoAtualizar) {
 
         Produto produto = produtoRepository.findById(produtoId)
                 .orElseThrow(()->
@@ -106,47 +131,54 @@ public class ProdutoServiceImpl implements ProdutoService {
                                 "Produto com id " + produtoId + " não encontrado"
                         ));
 
-        if(produtoParcial.getNome() != null) {
-            produto.setNome(produtoParcial.getNome());
-        }
+        produtoMapper.updateFromDto(produtoAtualizar, produto); // o Mapstruct gera todos os sets automaticamente! atualiza o que tiver para atualizar no objeto
+        // basta gravar no banco
+        // o fato de no mapper existir tratamento para ignorar null, é exatamente o que seria feito abaixo manualmente:
 
-        if(produtoParcial.getResumo() != null) {
-            produto.setResumo(produtoParcial.getResumo());
-        }
+//        if(produtoParcial.getNome() != null) {
+//            produto.setNome(produtoParcial.getNome());
+//        }
+//
+//        if(produtoParcial.getResumo() != null) {
+//            produto.setResumo(produtoParcial.getResumo());
+//        }
+//
+//        if(produtoParcial.getPreco() != null) {
+//            produto.setPreco(produtoParcial.getPreco());
+//        }
+//
+//        if(produtoParcial.getEstoque() != null) {
+//            produto.setEstoque(produtoParcial.getEstoque());
+//        }
+//
+//        if(produtoParcial.getImagemURL() != null) {
+//            produto.setImagemURL(produtoParcial.getImagemURL());
+//        }
+//
+//        if(produtoParcial.getDestaque() != null) {
+//            produto.setDestaque(produtoParcial.getDestaque());
+//        }
+//
+//        if(produtoParcial.getDesconto() != null) {
+//            produto.setDesconto(produtoParcial.getDesconto());
+//        }
 
-        if(produtoParcial.getPreco() != null) {
-            produto.setPreco(produtoParcial.getPreco());
-        }
-
-        if(produtoParcial.getEstoque() != null) {
-            produto.setEstoque(produtoParcial.getEstoque());
-        }
-
-        if(produtoParcial.getImagemURL() != null) {
-            produto.setImagemURL(produtoParcial.getImagemURL());
-        }
-
-        if(produtoParcial.getDestaque() != null) {
-            produto.setDestaque(produtoParcial.getDestaque());
-        }
-
-        if(produtoParcial.getDesconto() != null) {
-            produto.setDesconto(produtoParcial.getDesconto());
-        }
-
-        if(produtoParcial.getCategoriaId() != null) {
-
-            Categoria categoria = categoriaRepository.findById(produtoParcial.getId())
+        if(produtoAtualizar.getCategoriaId() != null) {
+            Categoria categoria = categoriaRepository.findById(produtoAtualizar.getCategoriaId())
                     .orElseThrow(()->
                             new RecursoNaoEncontradoException(
-                                    "Produto com id " + produtoId + " não encontrado"
+                                    "Categoria com id " + produtoAtualizar.getCategoriaId() + " não encontrado"
                             ));
-
-            produto.setCategoria(produtoParcial.getCategoriaId());
+            produto.setCategoria(categoria);
         }
 
-        if(produtoParcial.getMarcaId() != null) {
-            produto.setMarcaId(produtoParcial.getMarcaId());
+        if(produtoAtualizar.getMarcaId() != null) {
+            Marca marca = marcaRepository.findById(produtoAtualizar.getMarcaId())
+                    .orElseThrow(()->
+                            new RecursoNaoEncontradoException(
+                                    "Marca com id " + produtoAtualizar.getMarcaId() + " não encontrado"
+                            ));
+            produto.setMarca(marca);
         }
 
         return produtoRepository.save(produto);

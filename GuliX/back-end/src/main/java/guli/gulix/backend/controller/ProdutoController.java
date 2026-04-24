@@ -2,6 +2,7 @@ package guli.gulix.backend.controller;
 
 import guli.gulix.backend.dto.ProdutoCreateDTO;
 import guli.gulix.backend.dto.ProdutoResponseDTO;
+import guli.gulix.backend.dto.ProdutoUpdateDTO;
 import guli.gulix.backend.entity.Produto;
 import guli.gulix.backend.mapper.ProdutoMapper;
 import guli.gulix.backend.repository.ProdutoRepository;
@@ -23,8 +24,13 @@ public class ProdutoController {
     private final ProdutoMapper produtoMapper;
 
     @GetMapping
-    public ResponseEntity<List<Produto>> getAllProduto() {
-        return ResponseEntity.ok(produtoService.getAllProduto());
+    public ResponseEntity<List<ProdutoResponseDTO>> getAllProduto() {
+
+        List<Produto> produtos = produtoService.getAllProduto();
+
+        List<ProdutoResponseDTO> response = produtos.stream().map(produtoMapper::toDTO).toList();
+
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/{produtoId}")
@@ -57,19 +63,19 @@ public class ProdutoController {
     }
 
     @PutMapping("/{produtoId}")
-    public ResponseEntity<Produto> updateProdutoById(@PathVariable("produtoId") Integer produtoId, @RequestBody Produto produtoAtualizar) {
+    public ResponseEntity<ProdutoResponseDTO> updateProdutoById(@PathVariable("produtoId") Integer produtoId, @RequestBody ProdutoUpdateDTO produtoAtualizar) {
 
         Produto produtoAtualizado = produtoService.updateProdutoById(produtoId, produtoAtualizar);
 
-        return ResponseEntity.ok(produtoAtualizado);
+        return ResponseEntity.ok(produtoMapper.toDTO(produtoAtualizado));
     }
 
     @PatchMapping("/{produtoId}")
-    public ResponseEntity<Produto> updatePartialProdutoById(@PathVariable("produtoId") Integer produtoId, @RequestBody Produto produtoParcial) {
+    public ResponseEntity<ProdutoResponseDTO> updatePartialProdutoById(@PathVariable("produtoId") Integer produtoId, @RequestBody ProdutoUpdateDTO produtoAtualizar) {
 
-       Produto produtoAtualizado = produtoService.updatePartialProdutoById(produtoId, produtoParcial);
+       Produto produtoAtualizado = produtoService.updatePartialProdutoById(produtoId, produtoAtualizar);
 
-       return ResponseEntity.ok(produtoAtualizado);
+       return ResponseEntity.ok(produtoMapper.toDTO(produtoAtualizado));
     }
 
 }

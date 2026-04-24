@@ -37,12 +37,16 @@ public class Produto {
     @Column(name = "atualizado_em")
     private LocalDateTime atualizadoEm;
 
-    @Column(name = "categoria_id")
+//  @Column(name = "categoria_id")  // não se coloca isso porque, com essa anotação, faz o hibernate achar que é um tipo simples, e não, porque categoria é uma outra entidade
+    @ManyToOne   // indica que existe um relacionamento de muitos produtos para uma categoria
+    @JoinColumn(name = "categoria_id")  // indica que esse atributo é um campo FK do banco
     private Categoria categoria;
 
-    @Column(name = "marca_id")
+    //  @Column(name = "marca_id")  // não se coloca isso porque, com essa anotação, faz o hibernate achar que é um tipo simples, e não, porque marca é uma outra entidade
+    @ManyToOne   // indica que existe um relacionamento de muitos produtos para uma marca
+    @JoinColumn(name = "marca_id")  // indica que esse atributo é um campo FK do banco
     private Marca marca;
-    private Boolean destaque;
 
+    private Boolean destaque;
     private BigDecimal desconto;
 }
