@@ -46,7 +46,7 @@ public class ProdutoController {
 
         HttpHeaders headers = new HttpHeaders();
 
-        headers.add("Location", "/api/v1/beer/" + novoProduto.getId().toString());
+        headers.add("Location", "/api/v1/produtos/" + novoProduto.getId().toString());
 
         ProdutoResponseDTO response = produtoMapper.toDTO(novoProduto);
 
