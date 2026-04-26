@@ -15,8 +15,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 
 @RequiredArgsConstructor
 @Service
@@ -28,21 +26,23 @@ public class ProdutoServiceImpl implements ProdutoService {
     private final ProdutoMapper produtoMapper;
 
     @Override
-    public List<Produto> getAllProduto() {
-        return produtoRepository.findAll();
+    public List<ProdutoResponseDTO> getAllProduto() {
+        return produtoRepository.findAll().stream().map(produtoMapper::toDTO).toList();
     }
 
     @Override
-    public Produto getProdutoById(Integer produtoId) {
-        return produtoRepository.findById(produtoId)
+    public ProdutoResponseDTO getProdutoById(Integer produtoId) {
+        Produto produto =  produtoRepository.findById(produtoId)
                 .orElseThrow(()->
                         new RecursoNaoEncontradoException(
                          "Produto com id " + produtoId + " não encontrado"
                         ));
+
+        return produtoMapper.toDTO(produto);
     }
 
     @Override
-    public Produto createNewProduto(ProdutoCreateDTO produtoRequest) {
+    public ProdutoResponseDTO createNewProduto(ProdutoCreateDTO produtoRequest) {
 
         Produto produto = produtoMapper.toEntity(produtoRequest);
 
@@ -64,7 +64,7 @@ public class ProdutoServiceImpl implements ProdutoService {
             produto.setMarca(marca);
         }
 
-        return produtoRepository.save(produto);
+        return produtoMapper.toDTO(produtoRepository.save(produto));
     }
 
     @Override
@@ -78,7 +78,7 @@ public class ProdutoServiceImpl implements ProdutoService {
     }
 
     @Override
-    public Produto updateProdutoById(Integer produtoId, ProdutoUpdateDTO produtoAtualizar) {
+    public ProdutoResponseDTO updateProdutoById(Integer produtoId, ProdutoUpdateDTO produtoAtualizar) {
 
         Produto produto = produtoRepository.findById(produtoId)
                 .orElseThrow(()->
@@ -86,7 +86,7 @@ public class ProdutoServiceImpl implements ProdutoService {
                                 "Produto com id " + produtoId + " não encontrado"
                         ));
 
-        produtoMapper.updateFromDto(produtoAtualizar, produto); // o Mapstruct gera todos os sets automaticamente! atualiza o que tiver para atualizar no objeto
+        produtoMapper.updateEntityFromDto(produtoAtualizar, produto); // o Mapstruct gera todos os sets automaticamente! atualiza o que tiver para atualizar no objeto
         // basta gravar no banco
         // o fato de existir metodo no mapper tratando update, representa exatamente o que seria feito abaixo manualmente:
 
@@ -118,12 +118,12 @@ public class ProdutoServiceImpl implements ProdutoService {
             produto.setMarca(marca);
         }
 
-        return produtoRepository.save(produto);
+        return produtoMapper.toDTO(produtoRepository.save(produto));
 
     }
 
     @Override
-    public Produto updatePartialProdutoById(Integer produtoId, ProdutoUpdateDTO produtoAtualizar) {
+    public ProdutoResponseDTO updatePartialProdutoById(Integer produtoId, ProdutoUpdateDTO produtoAtualizar) {
 
         Produto produto = produtoRepository.findById(produtoId)
                 .orElseThrow(()->
@@ -131,7 +131,7 @@ public class ProdutoServiceImpl implements ProdutoService {
                                 "Produto com id " + produtoId + " não encontrado"
                         ));
 
-        produtoMapper.updateFromDto(produtoAtualizar, produto); // o Mapstruct gera todos os sets automaticamente! atualiza o que tiver para atualizar no objeto
+        produtoMapper.updateEntityFromDto(produtoAtualizar, produto); // o Mapstruct gera todos os sets automaticamente! atualiza o que tiver para atualizar no objeto
         // basta gravar no banco
         // o fato de no mapper existir tratamento para ignorar null, é exatamente o que seria feito abaixo manualmente:
 
@@ -181,7 +181,7 @@ public class ProdutoServiceImpl implements ProdutoService {
             produto.setMarca(marca);
         }
 
-        return produtoRepository.save(produto);
+        return produtoMapper.toDTO(produtoRepository.save(produto));
     }
 
 }

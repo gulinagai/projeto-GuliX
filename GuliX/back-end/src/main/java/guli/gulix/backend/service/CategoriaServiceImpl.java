@@ -1,6 +1,7 @@
 package guli.gulix.backend.service;
 
 import guli.gulix.backend.dto.CategoriaRequestDTO;
+import guli.gulix.backend.dto.CategoriaResponseDTO;
 import guli.gulix.backend.entity.Categoria;
 import guli.gulix.backend.exception.RecursoNaoEncontradoException;
 import guli.gulix.backend.mapper.CategoriaMapper;
@@ -18,29 +19,31 @@ public class CategoriaServiceImpl implements CategoriaService {
     private final CategoriaMapper categoriaMapper;
 
     @Override
-    public List<Categoria> getListCategoria() {
-        return categoriaRepository.findAll();
+    public List<CategoriaResponseDTO> getListCategoria() {
+        return categoriaRepository.findAll().stream().map(categoriaMapper::toDTO).toList();
     }
 
     @Override
-    public Categoria getCategoriaById(Integer categoriaId) {
-        return categoriaRepository.findById(categoriaId)
+    public CategoriaResponseDTO getCategoriaById(Integer categoriaId) {
+        Categoria categoria = categoriaRepository.findById(categoriaId)
                 .orElseThrow(()->
                         new RecursoNaoEncontradoException(
                          "Produto com id" + categoriaId + " não encontrado"
                         ));
+
+        return categoriaMapper.toDTO(categoria);
     }
 
     @Override
-    public Categoria createNewCategoria(CategoriaRequestDTO categoriaRequest) {
+    public CategoriaResponseDTO createNewCategoria(CategoriaRequestDTO categoriaRequest) {
 
         Categoria categoria = categoriaMapper.toEntity(categoriaRequest);
 
-        return categoriaRepository.save(categoria);
+        return categoriaMapper.toDTO(categoriaRepository.save(categoria));
     }
 
     @Override
-    public Categoria updateCategoriaById(Integer categoriaId, CategoriaRequestDTO categoriaAtualizar) {
+    public CategoriaResponseDTO updateCategoriaById(Integer categoriaId, CategoriaRequestDTO categoriaAtualizar) {
 
         Categoria categoria = categoriaRepository.findById(categoriaId)
                 .orElseThrow(()->
@@ -50,7 +53,7 @@ public class CategoriaServiceImpl implements CategoriaService {
 
         categoriaMapper.updateFromDto(categoriaAtualizar, categoria);
 
-        return categoriaRepository.save(categoria);
+        return categoriaMapper.toDTO(categoriaRepository.save(categoria));
     }
 
     @Override

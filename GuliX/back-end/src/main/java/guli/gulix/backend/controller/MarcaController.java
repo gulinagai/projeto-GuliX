@@ -29,42 +29,34 @@ public class MarcaController {
     @GetMapping
     public ResponseEntity<List<MarcaResponseDTO>> getListMarca() {
 
-        List<Marca> marcas = marcaService.getListMarca();
+        List<MarcaResponseDTO> response = marcaService.getListMarca();
 
-        List<MarcaResponseDTO> response = marcas.stream().map(marcaMapper::toDTO).toList();
-        System.out.println(response);
         return ResponseEntity.ok(response);
     }
 
     @GetMapping("/{marcaId}")
     public ResponseEntity<MarcaResponseDTO> getMarcaById(@PathVariable("marcaId") Integer marcaId) {
-
-        Marca marca = marcaService.getMarcaById(marcaId);
-
-        return ResponseEntity.ok(marcaMapper.toDTO(marca));
+        return ResponseEntity.ok(marcaService.getMarcaById(marcaId));
     }
 
     @PostMapping
     public ResponseEntity<MarcaResponseDTO> createNewMarca(@RequestBody MarcaRequestDTO marcaRequest) {
 
-        Marca novaMarca = marcaService.createNewMarca(marcaRequest);
+        MarcaResponseDTO response = marcaService.createNewMarca(marcaRequest);
 
         HttpHeaders headers = new HttpHeaders();
 
-        headers.add("Location", "/api/v1/marcas/" + novaMarca.getId().toString());
-
-        MarcaResponseDTO response = marcaMapper.toDTO(novaMarca);
+        headers.add("Location", "/api/v1/marcas/" + response.getId().toString());
 
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
-
     }
 
     @PutMapping("/{marcaId}")
     public ResponseEntity<MarcaResponseDTO> updateMarcaById(@PathVariable("marcaId") Integer marcaId, @RequestBody MarcaRequestDTO marcaAtualizar) {
 
-        Marca marca = marcaService.updateMarcaById(marcaId, marcaAtualizar);
+        MarcaResponseDTO response = marcaService.updateMarcaById(marcaId, marcaAtualizar);
 
-        return ResponseEntity.ok(marcaMapper.toDTO(marca));
+        return ResponseEntity.ok(response);
 
     }
 

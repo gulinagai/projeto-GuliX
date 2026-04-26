@@ -2,6 +2,7 @@ package guli.gulix.backend.service;
 
 import guli.gulix.backend.dto.MarcaRequestDTO;
 
+import guli.gulix.backend.dto.MarcaResponseDTO;
 import guli.gulix.backend.entity.Marca;
 import guli.gulix.backend.exception.RecursoNaoEncontradoException;
 import guli.gulix.backend.mapper.MarcaMapper;
@@ -19,29 +20,31 @@ public class MarcaServiceImpl implements MarcaService {
     private final MarcaMapper marcaMapper;
 
     @Override
-    public List<Marca> getListMarca() {
-        return marcaRepository.findAll();
+    public List<MarcaResponseDTO> getListMarca() {
+        return marcaRepository.findAll().stream().map(marcaMapper::toDTO).toList();
     }
 
     @Override
-    public Marca getMarcaById(Integer marcaId) {
-        return marcaRepository.findById(marcaId)
+    public MarcaResponseDTO getMarcaById(Integer marcaId) {
+        Marca marca = marcaRepository.findById(marcaId)
                 .orElseThrow(()->
                         new RecursoNaoEncontradoException(
                                 "Produto com id" + marcaId + " não encontrado"
                         ));
+
+        return marcaMapper.toDTO(marca);
     }
 
     @Override
-    public Marca createNewMarca(MarcaRequestDTO marcaRequest) {
+    public MarcaResponseDTO createNewMarca(MarcaRequestDTO marcaRequest) {
 
-        Marca marca = marcaMapper.toEntity(marcaRequest);
+        Marca novaMarca = marcaMapper.toEntity(marcaRequest);
 
-        return marcaRepository.save(marca);
+        return marcaMapper.toDTO(marcaRepository.save(novaMarca));
     }
 
     @Override
-    public Marca updateMarcaById(Integer marcaId, MarcaRequestDTO marcaAtualizar) {
+    public MarcaResponseDTO updateMarcaById(Integer marcaId, MarcaRequestDTO marcaAtualizar) {
 
         Marca marca = marcaRepository.findById(marcaId)
                 .orElseThrow(()->
@@ -51,7 +54,7 @@ public class MarcaServiceImpl implements MarcaService {
 
         marcaMapper.updateFromDto(marcaAtualizar, marca);
 
-        return marcaRepository.save(marca);
+        return marcaMapper.toDTO(marcaRepository.save(marca));
     }
 
     @Override

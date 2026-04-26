@@ -1,6 +1,7 @@
 package guli.gulix.backend.service;
 
 import guli.gulix.backend.dto.MarcaRequestDTO;
+import guli.gulix.backend.dto.MarcaResponseDTO;
 import guli.gulix.backend.entity.Marca;
 
 
@@ -8,13 +9,13 @@ import java.util.List;
 
 public interface MarcaService {
 
-    List<Marca> getListMarca();
+    List<MarcaResponseDTO> getListMarca();
 
-    Marca getMarcaById(Integer marcaId);
+    MarcaResponseDTO getMarcaById(Integer marcaId);
 
-    Marca createNewMarca(MarcaRequestDTO marcaRequest);
+    MarcaResponseDTO createNewMarca(MarcaRequestDTO marcaRequest);
 
-    Marca updateMarcaById(Integer marcaId, MarcaRequestDTO marcaAtualizar);
+    MarcaResponseDTO updateMarcaById(Integer marcaId, MarcaRequestDTO marcaAtualizar);
 
     void deleteMarcaById(Integer marcaId);
 }

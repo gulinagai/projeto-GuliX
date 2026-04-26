@@ -1,4 +1,7 @@
 package guli.gulix.backend.repository;
 
-public interface UsuarioRepository {
+import guli.gulix.backend.entity.Usuario;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface UsuarioRepository extends JpaRepository<Usuario, Integer> {
 }

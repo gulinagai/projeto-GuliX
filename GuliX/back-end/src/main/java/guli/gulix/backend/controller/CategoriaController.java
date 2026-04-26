@@ -24,31 +24,24 @@ public class CategoriaController {
     @GetMapping
     public ResponseEntity<List<CategoriaResponseDTO>> getListCategoria() {
 
-        List<Categoria> categorias = categoriaService.getListCategoria();
+        List<CategoriaResponseDTO> response = categoriaService.getListCategoria();
 
-        List<CategoriaResponseDTO> response = categorias.stream().map(categoriaMapper::toDTO).toList();
-        System.out.println(response);
         return ResponseEntity.ok(response);
     }
 
     @GetMapping("/{categoriaId}")
     public ResponseEntity<CategoriaResponseDTO> getCategoriaById(@PathVariable("categoriaId") Integer categoriaId) {
-
-        Categoria categoria = categoriaService.getCategoriaById(categoriaId);
-
-        return ResponseEntity.ok(categoriaMapper.toDTO(categoria));
+        return ResponseEntity.ok(categoriaService.getCategoriaById(categoriaId));
     }
 
     @PostMapping
     public ResponseEntity<CategoriaResponseDTO> createNewCategoria(@RequestBody CategoriaRequestDTO categoriaRequest) {
 
-        Categoria novaCategoria = categoriaService.createNewCategoria(categoriaRequest);
+        CategoriaResponseDTO response = categoriaService.createNewCategoria(categoriaRequest);
 
         HttpHeaders headers = new HttpHeaders();
 
-        headers.add("Location", "/api/v1/categorias/" + novaCategoria.getId().toString());
-
-        CategoriaResponseDTO response = categoriaMapper.toDTO(novaCategoria);
+        headers.add("Location", "/api/v1/categorias/" + response.getId().toString());
 
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
 
@@ -57,9 +50,9 @@ public class CategoriaController {
     @PutMapping("/{categoriaId}")
     public ResponseEntity<CategoriaResponseDTO> updateCategoriaById(@PathVariable("categoriaId") Integer categoriaId, @RequestBody CategoriaRequestDTO categoriaAtualizar) {
 
-        Categoria categoria = categoriaService.updateCategoriaById(categoriaId, categoriaAtualizar);
+        CategoriaResponseDTO response = categoriaService.updateCategoriaById(categoriaId, categoriaAtualizar);
 
-        return ResponseEntity.ok(categoriaMapper.toDTO(categoria));
+        return ResponseEntity.ok(response);
 
     }
 

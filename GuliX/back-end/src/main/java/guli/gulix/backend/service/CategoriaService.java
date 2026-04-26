@@ -1,6 +1,7 @@
 package guli.gulix.backend.service;
 
 import guli.gulix.backend.dto.CategoriaRequestDTO;
+import guli.gulix.backend.dto.CategoriaResponseDTO;
 import guli.gulix.backend.entity.Categoria;
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -8,13 +9,13 @@ import java.util.List;
 
 public interface CategoriaService {
 
-    List<Categoria> getListCategoria();
+    List<CategoriaResponseDTO> getListCategoria();
 
-    Categoria getCategoriaById(Integer categoriaId);
+    CategoriaResponseDTO getCategoriaById(Integer categoriaId);
 
-    Categoria createNewCategoria(CategoriaRequestDTO categoriaRequest);
+    CategoriaResponseDTO createNewCategoria(CategoriaRequestDTO categoriaRequest);
 
-    Categoria updateCategoriaById(Integer categoriaId, CategoriaRequestDTO categoriaAtualizar);
+    CategoriaResponseDTO updateCategoriaById(Integer categoriaId, CategoriaRequestDTO categoriaAtualizar);
 
     void deleteCategoriaById(Integer categoriaId);
 }

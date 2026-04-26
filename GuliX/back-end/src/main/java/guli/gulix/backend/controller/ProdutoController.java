@@ -25,33 +25,24 @@ public class ProdutoController {
 
     @GetMapping
     public ResponseEntity<List<ProdutoResponseDTO>> getAllProduto() {
-
-        List<Produto> produtos = produtoService.getAllProduto();
-
-        List<ProdutoResponseDTO> response = produtos.stream().map(produtoMapper::toDTO).toList();
-
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(produtoService.getAllProduto());
     }
 
     @GetMapping("/{produtoId}")
     public ResponseEntity<ProdutoResponseDTO> getProdutoById(@PathVariable("produtoId") Integer produtoId) {
-        Produto produto = produtoService.getProdutoById(produtoId);
-        return ResponseEntity.ok(produtoMapper.toDTO(produto));
+        return ResponseEntity.ok(produtoService.getProdutoById(produtoId));
     }
 
     @PostMapping
     public ResponseEntity<ProdutoResponseDTO> createNewProduto(@RequestBody ProdutoCreateDTO produtoRequest) {
 
-        Produto novoProduto = produtoService.createNewProduto(produtoRequest);
+        ProdutoResponseDTO novoProduto = produtoService.createNewProduto(produtoRequest);
 
         HttpHeaders headers = new HttpHeaders();
 
         headers.add("Location", "/api/v1/produtos/" + novoProduto.getId().toString());
 
-        ProdutoResponseDTO response = produtoMapper.toDTO(novoProduto);
-
-
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        return ResponseEntity.status(HttpStatus.CREATED).headers(headers).body(novoProduto);
     }
 
 
@@ -65,17 +56,17 @@ public class ProdutoController {
     @PutMapping("/{produtoId}")
     public ResponseEntity<ProdutoResponseDTO> updateProdutoById(@PathVariable("produtoId") Integer produtoId, @RequestBody ProdutoUpdateDTO produtoAtualizar) {
 
-        Produto produtoAtualizado = produtoService.updateProdutoById(produtoId, produtoAtualizar);
+        ProdutoResponseDTO produtoAtualizado = produtoService.updateProdutoById(produtoId, produtoAtualizar);
 
-        return ResponseEntity.ok(produtoMapper.toDTO(produtoAtualizado));
+        return ResponseEntity.ok(produtoAtualizado);
     }
 
     @PatchMapping("/{produtoId}")
     public ResponseEntity<ProdutoResponseDTO> updatePartialProdutoById(@PathVariable("produtoId") Integer produtoId, @RequestBody ProdutoUpdateDTO produtoAtualizar) {
 
-       Produto produtoAtualizado = produtoService.updatePartialProdutoById(produtoId, produtoAtualizar);
+        ProdutoResponseDTO produtoAtualizado = produtoService.updatePartialProdutoById(produtoId, produtoAtualizar);
 
-       return ResponseEntity.ok(produtoMapper.toDTO(produtoAtualizado));
+       return ResponseEntity.ok(produtoAtualizado);
     }
 
 }

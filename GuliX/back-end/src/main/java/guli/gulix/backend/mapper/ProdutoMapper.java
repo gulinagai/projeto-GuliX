@@ -24,6 +24,6 @@ public interface ProdutoMapper {
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     @Mapping(target = "categoria", ignore = true)
     @Mapping(target = "marca", ignore = true)
-    void updateFromDto(ProdutoUpdateDTO dto, @MappingTarget Produto produto);
+    void updateEntityFromDto(ProdutoUpdateDTO dto, @MappingTarget Produto produto);
 
 }
