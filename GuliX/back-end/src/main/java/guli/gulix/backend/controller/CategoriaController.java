@@ -19,7 +19,6 @@ import java.util.List;
 @RequestMapping("/api/v1/categorias")
 public class CategoriaController {
     private final CategoriaService categoriaService;
-    private final CategoriaMapper categoriaMapper;
 
     @GetMapping
     public ResponseEntity<List<CategoriaResponseDTO>> getListCategoria() {
@@ -43,7 +42,7 @@ public class CategoriaController {
 
         headers.add("Location", "/api/v1/categorias/" + response.getId().toString());
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        return ResponseEntity.status(HttpStatus.CREATED).headers(headers).body(response);
 
     }
 

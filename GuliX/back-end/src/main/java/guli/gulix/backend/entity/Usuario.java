@@ -1,15 +1,14 @@
 package guli.gulix.backend.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
 
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
@@ -20,12 +19,16 @@ public class Usuario {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
+    @Column(nullable = false)
     private String nome;
 
+    @Column(nullable = false, unique = true)
     private String email;
 
+    @Column(name = "senha_hash", nullable = false)
     private String senhaHash;
 
+    @Column(nullable = false)
     private String telefone;
 
     @CreationTimestamp
@@ -37,3 +40,4 @@ public class Usuario {
     private LocalDateTime atualizadoEm;
 
 }
+

@@ -21,7 +21,6 @@ import java.util.List;
 @RequestMapping("/api/v1/produtos")
 public class ProdutoController {
     private final ProdutoService produtoService;
-    private final ProdutoMapper produtoMapper;
 
     @GetMapping
     public ResponseEntity<List<ProdutoResponseDTO>> getAllProduto() {

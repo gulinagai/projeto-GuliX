@@ -8,6 +8,7 @@ import guli.gulix.backend.exception.RecursoNaoEncontradoException;
 import guli.gulix.backend.mapper.UsuarioMapper;
 import guli.gulix.backend.repository.UsuarioRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -18,6 +19,7 @@ public class UsuarioServiceImpl implements UsuarioService {
 
     private final UsuarioRepository usuarioRepository;
     private final UsuarioMapper usuarioMapper;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     public List<UsuarioResponseDTO> getListUsuario() {
@@ -40,7 +42,11 @@ public class UsuarioServiceImpl implements UsuarioService {
 
         Usuario novoUsuario = usuarioMapper.toEntity(usuarioRequest);
 
-         return usuarioMapper.toDTO(usuarioRepository.save(novoUsuario));
+        novoUsuario.setSenhaHash(passwordEncoder.encode(usuarioRequest.getSenha()));
+
+        Usuario salvo = usuarioRepository.save(novoUsuario);
+
+         return usuarioMapper.toDTO(salvo);
     }
 
     @Override
@@ -54,7 +60,13 @@ public class UsuarioServiceImpl implements UsuarioService {
 
         usuarioMapper.updateEntityfromDTO(usuarioAtualizar, usuario);
 
-        return usuarioMapper.toDTO(usuarioRepository.save(usuario));
+        if(usuarioAtualizar.getSenha() != null && !usuarioAtualizar.getSenha().isBlank()) {
+            usuario.setSenhaHash(passwordEncoder.encode(usuarioAtualizar.getSenha()));
+        }
+
+        Usuario atualizado = usuarioRepository.save(usuario);
+
+        return usuarioMapper.toDTO(atualizado);
 
     }
 
@@ -68,7 +80,13 @@ public class UsuarioServiceImpl implements UsuarioService {
 
         usuarioMapper.updateEntityfromDTO(usuarioAtualizar, usuario);
 
-        return usuarioMapper.toDTO(usuarioRepository.save(usuario));
+        if(usuarioAtualizar.getSenha() != null && !usuarioAtualizar.getSenha().isBlank()) {
+            usuario.setSenhaHash(passwordEncoder.encode(usuarioAtualizar.getSenha()));
+        }
+
+        Usuario atualizado = usuarioRepository.save(usuario);
+
+        return usuarioMapper.toDTO(atualizado);
     }
 
     @Override

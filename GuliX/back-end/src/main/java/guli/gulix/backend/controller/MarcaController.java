@@ -24,7 +24,6 @@ import java.util.List;
 @RequestMapping("/api/v1/marcas")
 public class MarcaController {
     private final MarcaService marcaService;
-    private final MarcaMapper marcaMapper;
 
     @GetMapping
     public ResponseEntity<List<MarcaResponseDTO>> getListMarca() {
@@ -48,7 +47,7 @@ public class MarcaController {
 
         headers.add("Location", "/api/v1/marcas/" + response.getId().toString());
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        return ResponseEntity.status(HttpStatus.CREATED).headers(headers).body(response);
     }
 
     @PutMapping("/{marcaId}")

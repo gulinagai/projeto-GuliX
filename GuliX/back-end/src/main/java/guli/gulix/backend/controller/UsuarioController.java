@@ -3,12 +3,12 @@ package guli.gulix.backend.controller;
 import guli.gulix.backend.dto.UsuarioCreateDTO;
 import guli.gulix.backend.dto.UsuarioResponseDTO;
 import guli.gulix.backend.dto.UsuarioUpdateDTO;
-import guli.gulix.backend.entity.Usuario;
-import guli.gulix.backend.mapper.UsuarioMapper;
+
 import guli.gulix.backend.service.UsuarioService;
-import jakarta.websocket.server.PathParam;
+
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.apache.coyote.Response;
+
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,7 +22,6 @@ import java.util.List;
 public class UsuarioController {
 
     private final UsuarioService usuarioService;
-    private final UsuarioMapper usuarioMapper;
 
     @GetMapping
     public ResponseEntity<List<UsuarioResponseDTO>> getListUsuario() {
@@ -34,12 +33,12 @@ public class UsuarioController {
 
 
     @GetMapping("/{usuarioId}")
-    public ResponseEntity<UsuarioResponseDTO> getUsuarioById(@PathParam("/usuarioId") Integer usuarioId) {
+    public ResponseEntity<UsuarioResponseDTO> getUsuarioById(@PathVariable("usuarioId") Integer usuarioId) {
         return ResponseEntity.ok(usuarioService.getUsuarioById(usuarioId));
     }
 
     @PostMapping
-    public ResponseEntity<UsuarioResponseDTO> createNewUsuario(@RequestBody UsuarioCreateDTO usuarioRequest) {
+    public ResponseEntity<UsuarioResponseDTO> createNewUsuario(@RequestBody @Valid UsuarioCreateDTO usuarioRequest) {
 
         UsuarioResponseDTO response = usuarioService.createNewUsuario(usuarioRequest);
 
@@ -47,12 +46,12 @@ public class UsuarioController {
 
         headers.add("Location", "/api/v1/usuarios/" + response.getId().toString());
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        return ResponseEntity.status(HttpStatus.CREATED).headers(headers).body(response);
     }
 
 
     @PutMapping("/{usuarioId}")
-    public ResponseEntity<UsuarioResponseDTO> updateUsuarioById(@PathParam("usuarioId") Integer usuarioId, @RequestBody UsuarioUpdateDTO usuarioAtualizar) {
+    public ResponseEntity<UsuarioResponseDTO> updateUsuarioById(@PathVariable("usuarioId") Integer usuarioId, @RequestBody @Valid UsuarioUpdateDTO usuarioAtualizar) {
 
         UsuarioResponseDTO usuarioAtualizado = usuarioService.updateUsuarioById(usuarioId, usuarioAtualizar);
 
@@ -60,7 +59,7 @@ public class UsuarioController {
     }
 
     @PatchMapping("/{usuarioId}")
-    public ResponseEntity<UsuarioResponseDTO> updatePatchUsuarioById(@PathParam("usuarioId") Integer usuarioId, @RequestBody UsuarioUpdateDTO usuarioAtualizar) {
+    public ResponseEntity<UsuarioResponseDTO> updatePatchUsuarioById(@PathVariable("usuarioId") Integer usuarioId, @RequestBody @Valid UsuarioUpdateDTO usuarioAtualizar) {
 
         UsuarioResponseDTO usuarioAtualizado = usuarioService.updatePatchUsuarioById(usuarioId, usuarioAtualizar);
 
@@ -68,7 +67,7 @@ public class UsuarioController {
     }
 
     @DeleteMapping(("/{usuarioId}"))
-    public ResponseEntity<Void> deleteUsuarioById(@PathParam("usuarioId") Integer usuarioId) {
+    public ResponseEntity<Void> deleteUsuarioById(@PathVariable("usuarioId") Integer usuarioId) {
 
         usuarioService.deleteUsuarioById(usuarioId);
 
