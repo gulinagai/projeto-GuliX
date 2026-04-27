@@ -18,18 +18,24 @@ public class Produto {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
+
+    @Column(nullable = false)
     private String nome;
+
+    @Column(nullable = false)
     private String resumo;
 
-    @Column(precision = 10, scale = 2)
+    @Column(precision = 10, scale = 2, nullable = false)
     private BigDecimal preco;
+
+    @Column(nullable = false)
     private Long estoque;
 
-    @Column(name = "imagem_url")
+    @Column(name = "imagem_url", nullable = false)
     private String imagemURL;
 
     @CreationTimestamp
-    @Column(name = "criado_em", updatable = false)
+    @Column(name = "criado_em", updatable = false, nullable = false)
     private LocalDateTime criadoEm;
 
     @UpdateTimestamp
