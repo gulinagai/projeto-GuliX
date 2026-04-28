@@ -1,4 +1,7 @@
 package guli.gulix.backend.repository;
 
-public interface CarrinhoRepository {
+import guli.gulix.backend.entity.Carrinho;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface CarrinhoRepository extends JpaRepository<Carrinho, Integer> {
 }
