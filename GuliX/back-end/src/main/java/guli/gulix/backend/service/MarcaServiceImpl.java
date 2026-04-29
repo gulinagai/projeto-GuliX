@@ -9,27 +9,31 @@ import guli.gulix.backend.mapper.MarcaMapper;
 import guli.gulix.backend.repository.MarcaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @RequiredArgsConstructor
 @Service
+@Transactional
 public class MarcaServiceImpl implements MarcaService {
 
     private final MarcaRepository marcaRepository;
     private final MarcaMapper marcaMapper;
 
     @Override
+    @Transactional(readOnly = true)
     public List<MarcaResponseDTO> getListMarca() {
         return marcaRepository.findAll().stream().map(marcaMapper::toDTO).toList();
     }
 
     @Override
+    @Transactional(readOnly = true)
     public MarcaResponseDTO getMarcaById(Integer marcaId) {
         Marca marca = marcaRepository.findById(marcaId)
                 .orElseThrow(()->
                         new RecursoNaoEncontradoException(
-                                "Produto com id" + marcaId + " não encontrado"
+                                "Marca com id " + marcaId + " não encontrado"
                         ));
 
         return marcaMapper.toDTO(marca);
@@ -49,12 +53,12 @@ public class MarcaServiceImpl implements MarcaService {
         Marca marca = marcaRepository.findById(marcaId)
                 .orElseThrow(()->
                         new RecursoNaoEncontradoException(
-                                "Produto com id" + marcaId + " não encontrado"
+                                "Marca com id " + marcaId + " não encontrado"
                         ));
 
         marcaMapper.updateFromDto(marcaAtualizar, marca);
 
-        return marcaMapper.toDTO(marcaRepository.save(marca));
+        return marcaMapper.toDTO(marca);
     }
 
     @Override
@@ -63,7 +67,7 @@ public class MarcaServiceImpl implements MarcaService {
         Marca marca = marcaRepository.findById(marcaId)
                 .orElseThrow(()->
                         new RecursoNaoEncontradoException(
-                                "Produto com id" + marcaId + " não encontrado"
+                                "Marca com id " + marcaId + " não encontrado"
                         ));
 
         marcaRepository.delete(marca);

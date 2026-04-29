@@ -10,11 +10,13 @@ import guli.gulix.backend.repository.UsuarioRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class UsuarioServiceImpl implements UsuarioService {
 
     private final UsuarioRepository usuarioRepository;
@@ -22,11 +24,13 @@ public class UsuarioServiceImpl implements UsuarioService {
     private final PasswordEncoder passwordEncoder;
 
     @Override
+    @Transactional(readOnly = true)
     public List<UsuarioResponseDTO> getListUsuario() {
         return usuarioRepository.findAll().stream().map(usuarioMapper::toDTO).toList();
     }
 
     @Override
+    @Transactional(readOnly = true)
     public UsuarioResponseDTO getUsuarioById(Integer usuarioId) {
         Usuario usuario = usuarioRepository.findById(usuarioId)
                 .orElseThrow(()->
@@ -64,9 +68,7 @@ public class UsuarioServiceImpl implements UsuarioService {
             usuario.setSenhaHash(passwordEncoder.encode(usuarioAtualizar.getSenha()));
         }
 
-        Usuario atualizado = usuarioRepository.save(usuario);
-
-        return usuarioMapper.toDTO(atualizado);
+        return usuarioMapper.toDTO(usuario);
 
     }
 
@@ -75,7 +77,7 @@ public class UsuarioServiceImpl implements UsuarioService {
         Usuario usuario = usuarioRepository.findById(usuarioId)
                 .orElseThrow(()->
                         new RecursoNaoEncontradoException(
-                                "Usuário com id" + usuarioId + " não encontrado"
+                                "Usuário com id " + usuarioId + " não encontrado"
                         ));
 
         usuarioMapper.updateEntityfromDTO(usuarioAtualizar, usuario);
@@ -84,9 +86,7 @@ public class UsuarioServiceImpl implements UsuarioService {
             usuario.setSenhaHash(passwordEncoder.encode(usuarioAtualizar.getSenha()));
         }
 
-        Usuario atualizado = usuarioRepository.save(usuario);
-
-        return usuarioMapper.toDTO(atualizado);
+        return usuarioMapper.toDTO(usuario);
     }
 
     @Override
@@ -94,7 +94,7 @@ public class UsuarioServiceImpl implements UsuarioService {
         Usuario usuario = usuarioRepository.findById(usuarioId)
                 .orElseThrow(()->
                         new RecursoNaoEncontradoException(
-                                "Usuário com id" + usuarioId + " não encontrado"
+                                "Usuário com id " + usuarioId + " não encontrado"
                         ));
 
         usuarioRepository.delete(usuario);

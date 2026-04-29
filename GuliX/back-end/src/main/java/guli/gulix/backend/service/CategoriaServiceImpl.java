@@ -8,27 +8,31 @@ import guli.gulix.backend.mapper.CategoriaMapper;
 import guli.gulix.backend.repository.CategoriaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @RequiredArgsConstructor
 @Service
+@Transactional
 public class CategoriaServiceImpl implements CategoriaService {
 
     private final CategoriaRepository categoriaRepository;
     private final CategoriaMapper categoriaMapper;
 
     @Override
+    @Transactional(readOnly = true)
     public List<CategoriaResponseDTO> getListCategoria() {
         return categoriaRepository.findAll().stream().map(categoriaMapper::toDTO).toList();
     }
 
     @Override
+    @Transactional(readOnly = true)
     public CategoriaResponseDTO getCategoriaById(Integer categoriaId) {
         Categoria categoria = categoriaRepository.findById(categoriaId)
                 .orElseThrow(()->
                         new RecursoNaoEncontradoException(
-                         "Produto com id" + categoriaId + " não encontrado"
+                         "Categoria com id " + categoriaId + " não encontrado"
                         ));
 
         return categoriaMapper.toDTO(categoria);
@@ -48,12 +52,12 @@ public class CategoriaServiceImpl implements CategoriaService {
         Categoria categoria = categoriaRepository.findById(categoriaId)
                 .orElseThrow(()->
                         new RecursoNaoEncontradoException(
-                                "Produto com id" + categoriaId + " não encontrado"
+                                "Categoria com id " + categoriaId + " não encontrado"
                         ));
 
         categoriaMapper.updateFromDto(categoriaAtualizar, categoria);
 
-        return categoriaMapper.toDTO(categoriaRepository.save(categoria));
+        return categoriaMapper.toDTO(categoria);
     }
 
     @Override
@@ -62,7 +66,7 @@ public class CategoriaServiceImpl implements CategoriaService {
         Categoria categoria = categoriaRepository.findById(categoriaId)
                 .orElseThrow(()->
                         new RecursoNaoEncontradoException(
-                                "Produto com id" + categoriaId + " não encontrado"
+                                "Categoria com id " + categoriaId + " não encontrado"
                         ));
 
         categoriaRepository.delete(categoria);

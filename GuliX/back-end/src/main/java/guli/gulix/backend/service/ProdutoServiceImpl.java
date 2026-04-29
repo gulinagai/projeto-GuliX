@@ -13,11 +13,13 @@ import guli.gulix.backend.repository.MarcaRepository;
 import guli.gulix.backend.repository.ProdutoRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @RequiredArgsConstructor
 @Service
+@Transactional
 public class ProdutoServiceImpl implements ProdutoService {
 
     private final ProdutoRepository produtoRepository;
@@ -26,11 +28,13 @@ public class ProdutoServiceImpl implements ProdutoService {
     private final ProdutoMapper produtoMapper;
 
     @Override
+    @Transactional(readOnly = true)
     public List<ProdutoResponseDTO> getAllProduto() {
         return produtoRepository.findAll().stream().map(produtoMapper::toDTO).toList();
     }
 
     @Override
+    @Transactional(readOnly = true)
     public ProdutoResponseDTO getProdutoById(Integer produtoId) {
         Produto produto =  produtoRepository.findById(produtoId)
                 .orElseThrow(()->
@@ -118,7 +122,7 @@ public class ProdutoServiceImpl implements ProdutoService {
             produto.setMarca(marca);
         }
 
-        return produtoMapper.toDTO(produtoRepository.save(produto));
+        return produtoMapper.toDTO(produto);
 
     }
 
@@ -181,7 +185,7 @@ public class ProdutoServiceImpl implements ProdutoService {
             produto.setMarca(marca);
         }
 
-        return produtoMapper.toDTO(produtoRepository.save(produto));
+        return produtoMapper.toDTO(produto);
     }
 
 }
