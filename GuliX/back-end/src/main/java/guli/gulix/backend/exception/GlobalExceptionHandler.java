@@ -24,4 +24,16 @@ public class GlobalExceptionHandler {
 
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(erro);
     }
+
+    @ExceptionHandler(RegraNegocioException.class)
+    public ResponseEntity<Map<String, Object>> handleBusiness(RegraNegocioException ex) {
+
+        Map<String, Object> erro = new HashMap<>();
+        erro.put("timestamp", LocalDateTime.now());
+        erro.put("status", 400);
+        erro.put("error", "Bad Request");
+        erro.put("message", ex.getMessage());
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(erro);
+    }
 }
