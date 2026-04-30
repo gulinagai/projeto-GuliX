@@ -17,7 +17,7 @@ public class CarrinhoController {
     private final CarrinhoService carrinhoService;
 
     @GetMapping
-    public ResponseEntity<CarrinhoResponseDTO> buscarCarrinho(@RequestParam Integer usuarioId) {
+    public ResponseEntity<CarrinhoResponseDTO> buscarCarrinho(@RequestParam("usuarioId")  Integer usuarioId) {
 
         CarrinhoResponseDTO response = carrinhoService.buscarCarrinho(usuarioId);
 
@@ -26,7 +26,7 @@ public class CarrinhoController {
 
     @PostMapping("/itens")
     public ResponseEntity<Void> adicionarItem(
-            @RequestParam Integer usuarioId,
+            @RequestParam("usuarioId")  Integer usuarioId,
             @RequestBody ItemCarrinhoRequestDTO dto
             ) {
         carrinhoService.adicionarItem(usuarioId, dto);
@@ -35,7 +35,7 @@ public class CarrinhoController {
 
     @PutMapping("/itens/{itemId}")
     public ResponseEntity<Void> atualizarQuantidade (
-            @RequestParam Integer usuarioId,
+            @RequestParam("usuarioId") Integer usuarioId,
             @PathVariable Integer itemId,
             @RequestBody ItemCarrinhoUpdateDTO dto
     ) {
@@ -45,7 +45,7 @@ public class CarrinhoController {
 
     @DeleteMapping("/itens/{itemId}")
     public ResponseEntity<Void> removerItem (
-            @RequestParam Integer usuarioId,
+            @RequestParam("usuarioId")  Integer usuarioId,
             @PathVariable Integer itemId
     ) {
         carrinhoService.removerItem(usuarioId, itemId);

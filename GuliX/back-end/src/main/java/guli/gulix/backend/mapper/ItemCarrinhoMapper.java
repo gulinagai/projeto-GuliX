@@ -5,7 +5,7 @@ import guli.gulix.backend.entity.ItemCarrinho;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", uses = ProdutoMapper.class)
 public interface ItemCarrinhoMapper {
     @Mapping(source = "produto.id", target = "produtoId")
     @Mapping(source = "produto.nome", target = "nomeProduto")

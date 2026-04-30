@@ -10,7 +10,7 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ItemCarrinhoResponseDTO {
-    private Integer id;
+    private Integer produtoId;
     private String nomeProduto;
     private BigDecimal preco;
     private Integer quantidade;

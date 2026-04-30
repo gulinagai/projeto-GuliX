@@ -30,7 +30,7 @@ public class CarrinhoServiceImpl implements CarrinhoService {
     private final ProdutoRepository produtoRepository;
     private final ItemCarrinhoRepository itemCarrinhoRepository;
 
-    @Transactional(readOnly = true)
+    @Transactional
     public CarrinhoResponseDTO buscarCarrinho(Integer usuarioId) {
 
         Carrinho carrinho = carrinhoRepository.findByUsuarioId(usuarioId)
@@ -112,6 +112,11 @@ public class CarrinhoServiceImpl implements CarrinhoService {
 
 
     private BigDecimal calcularTotal(Carrinho carrinho) {
+
+        if(carrinho.getItens() == null || carrinho.getItens().isEmpty()) {
+            return BigDecimal.ZERO;
+        }
+
         return carrinho.getItens().stream().map(item -> item.getProduto().getPreco().multiply(BigDecimal.valueOf(item.getQuantidade())))
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
