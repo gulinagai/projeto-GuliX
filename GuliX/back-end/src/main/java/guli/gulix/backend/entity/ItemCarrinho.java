@@ -26,6 +26,6 @@ public class ItemCarrinho {
     private Produto produto;
 
     @Column(nullable = false)
-    private Integer quantidade;
+    private Integer quantidade = 0;
 
 }

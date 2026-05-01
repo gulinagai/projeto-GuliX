@@ -8,6 +8,7 @@ import guli.gulix.backend.entity.ItemCarrinho;
 import guli.gulix.backend.entity.Produto;
 import guli.gulix.backend.entity.Usuario;
 import guli.gulix.backend.exception.RecursoNaoEncontradoException;
+import guli.gulix.backend.exception.RegraNegocioException;
 import guli.gulix.backend.mapper.CarrinhoMapper;
 import guli.gulix.backend.repository.CarrinhoRepository;
 import guli.gulix.backend.repository.ItemCarrinhoRepository;
@@ -58,18 +59,28 @@ public class CarrinhoServiceImpl implements CarrinhoService {
         ItemCarrinho item = itemCarrinhoRepository.findByCarrinhoAndProduto(carrinho, produto)
                 .orElse(null);
 
+        validarQuantidadeDTO(itemDTO.getQuantidade());
 
         if(item != null) {
-            item.setQuantidade(item.getQuantidade() + itemDTO.getQuantidade());
+            Integer novaQuantidade = item.getQuantidade() + itemDTO.getQuantidade();
+
+            validarEstoque(novaQuantidade, produto.getEstoque());
+            item.setQuantidade(novaQuantidade);
+
         } else {
             ItemCarrinho novo = new ItemCarrinho();
             novo.setCarrinho(carrinho);
             novo.setProduto(produto);
+            validarEstoque(itemDTO.getQuantidade(), produto.getEstoque());
             novo.setQuantidade(itemDTO.getQuantidade());
+
+
 
             itemCarrinhoRepository.save(novo);
         }
     }
+
+
 
     public void atualizarQuantidade(Integer usuarioId, Integer itemId, ItemCarrinhoUpdateDTO dto) {
          Carrinho carrinho = carrinhoRepository.findByUsuarioId(usuarioId)
@@ -85,7 +96,7 @@ public class CarrinhoServiceImpl implements CarrinhoService {
                          ));
 
          if(dto.getQuantidade() <= 0) {
-             throw new IllegalArgumentException("Quantidade deve ser maior que zero");
+             throw new RegraNegocioException("Quantidade deve ser maior que zero");
          }
 
          item.setQuantidade(dto.getQuantidade());
@@ -132,6 +143,27 @@ public class CarrinhoServiceImpl implements CarrinhoService {
         carrinho.setUsuario(usuario);
 
         return carrinhoRepository.save(carrinho);
+    }
+
+    private void validarEstoque(Integer quantidadeItem, Long quantidadeEstoque) {
+        // conversão para tipo primitivo para não gerar inconsistência por comparação entre tipos Wrapper. Comparação entre tipos primitivos é segura.
+        int quantItem = quantidadeItem;
+        long quantEst = quantidadeEstoque;
+
+
+        if(!(quantEst > 0)) {
+            throw new RegraNegocioException("Estoque zerado para este produto");
+        }
+
+        if(!(quantItem <= quantEst)) {
+            throw new RegraNegocioException("Quantidade solicitada maior que a quantidade disponível em estoque");
+        }
+    }
+
+    private void validarQuantidadeDTO(Integer quantidade) {
+        if(quantidade <= 0) {
+            throw new RegraNegocioException("Quantidade solicitada menor ou igual a zero");
+        }
     }
 
 }
