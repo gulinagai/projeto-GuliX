@@ -41,6 +41,9 @@ public class Endereco {
     @Column(nullable = false)
     private String cep;
 
+    @Column(nullable = false)
+    private boolean principal;
+
     @CreationTimestamp
     @Column(name = "criado_em", updatable = false)
     private LocalDateTime criadoEm;
