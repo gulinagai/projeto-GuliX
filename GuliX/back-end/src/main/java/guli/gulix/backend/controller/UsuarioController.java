@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -23,6 +24,7 @@ public class UsuarioController {
 
     private final UsuarioService usuarioService;
 
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping
     public ResponseEntity<List<UsuarioResponseDTO>> getListUsuario() {
 
@@ -31,25 +33,14 @@ public class UsuarioController {
         return ResponseEntity.ok(response);
     }
 
-
+    @PreAuthorize("hasRole('ADMIN') or #usuarioId == authentication.principal.id")
     @GetMapping("/{usuarioId}")
     public ResponseEntity<UsuarioResponseDTO> getUsuarioById(@PathVariable("usuarioId") Integer usuarioId) {
         return ResponseEntity.ok(usuarioService.getUsuarioById(usuarioId));
     }
 
-    @PostMapping
-    public ResponseEntity<UsuarioResponseDTO> createNewUsuario(@RequestBody @Valid UsuarioCreateDTO usuarioRequest) {
 
-        UsuarioResponseDTO response = usuarioService.createNewUsuario(usuarioRequest);
-
-        HttpHeaders headers = new HttpHeaders();
-
-        headers.add("Location", "/api/v1/usuarios/" + response.getId().toString());
-
-        return ResponseEntity.status(HttpStatus.CREATED).headers(headers).body(response);
-    }
-
-
+    @PreAuthorize("hasRole('ADMIN') or #usuarioId == authentication.principal.id")
     @PutMapping("/{usuarioId}")
     public ResponseEntity<UsuarioResponseDTO> updateUsuarioById(@PathVariable("usuarioId") Integer usuarioId, @RequestBody @Valid UsuarioUpdateDTO usuarioAtualizar) {
 
@@ -58,6 +49,7 @@ public class UsuarioController {
         return ResponseEntity.ok(usuarioAtualizado);
     }
 
+    @PreAuthorize("hasRole('ADMIN') or #usuarioId == authentication.principal.id")
     @PatchMapping("/{usuarioId}")
     public ResponseEntity<UsuarioResponseDTO> updatePatchUsuarioById(@PathVariable("usuarioId") Integer usuarioId, @RequestBody @Valid UsuarioUpdateDTO usuarioAtualizar) {
 
@@ -66,6 +58,7 @@ public class UsuarioController {
         return ResponseEntity.ok(usuarioAtualizado);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping(("/{usuarioId}"))
     public ResponseEntity<Void> deleteUsuarioById(@PathVariable("usuarioId") Integer usuarioId) {
 

@@ -12,6 +12,7 @@ import org.apache.coyote.Response;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -32,6 +33,7 @@ public class ProdutoController {
         return ResponseEntity.ok(produtoService.getProdutoById(produtoId));
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
     public ResponseEntity<ProdutoResponseDTO> createNewProduto(@RequestBody ProdutoCreateDTO produtoRequest) {
 
@@ -44,7 +46,7 @@ public class ProdutoController {
         return ResponseEntity.status(HttpStatus.CREATED).headers(headers).body(novoProduto);
     }
 
-
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{produtoId}")
     public ResponseEntity<Void> deleteProdutoById(@PathVariable("produtoId") Integer produtoId) {
         produtoService.deleteProdutoById(produtoId);
@@ -52,6 +54,7 @@ public class ProdutoController {
         return ResponseEntity.noContent().build();
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{produtoId}")
     public ResponseEntity<ProdutoResponseDTO> updateProdutoById(@PathVariable("produtoId") Integer produtoId, @RequestBody ProdutoUpdateDTO produtoAtualizar) {
 

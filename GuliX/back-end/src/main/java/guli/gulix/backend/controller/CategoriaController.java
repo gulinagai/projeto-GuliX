@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -33,6 +34,7 @@ public class CategoriaController {
         return ResponseEntity.ok(categoriaService.getCategoriaById(categoriaId));
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
     public ResponseEntity<CategoriaResponseDTO> createNewCategoria(@RequestBody CategoriaRequestDTO categoriaRequest) {
 
@@ -46,6 +48,7 @@ public class CategoriaController {
 
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{categoriaId}")
     public ResponseEntity<CategoriaResponseDTO> updateCategoriaById(@PathVariable("categoriaId") Integer categoriaId, @RequestBody CategoriaRequestDTO categoriaAtualizar) {
 
@@ -55,6 +58,7 @@ public class CategoriaController {
 
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{categoriaId}")
     public ResponseEntity<Void> deleteCategoriaById(@PathVariable Integer categoriaId) {
 

@@ -4,6 +4,7 @@ import guli.gulix.backend.dto.UsuarioCreateDTO;
 import guli.gulix.backend.dto.UsuarioResponseDTO;
 import guli.gulix.backend.dto.UsuarioUpdateDTO;
 import guli.gulix.backend.entity.Usuario;
+import guli.gulix.backend.entity.enums.Role;
 import guli.gulix.backend.exception.RecursoNaoEncontradoException;
 import guli.gulix.backend.mapper.UsuarioMapper;
 import guli.gulix.backend.repository.UsuarioRepository;
@@ -47,6 +48,8 @@ public class UsuarioServiceImpl implements UsuarioService {
         Usuario novoUsuario = usuarioMapper.toEntity(usuarioRequest);
 
         novoUsuario.setSenhaHash(passwordEncoder.encode(usuarioRequest.getSenha()));
+
+        novoUsuario.setRole(Role.ROLE_USER);
 
         Usuario salvo = usuarioRepository.save(novoUsuario);
 

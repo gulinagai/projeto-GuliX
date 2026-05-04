@@ -1,5 +1,6 @@
 package guli.gulix.backend.entity;
 
+import guli.gulix.backend.entity.enums.Role;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -39,5 +40,7 @@ public class Usuario {
     @Column(name = "atualizado_em")
     private LocalDateTime atualizadoEm;
 
+    @Enumerated(EnumType.STRING)
+    private Role role;
 }
 

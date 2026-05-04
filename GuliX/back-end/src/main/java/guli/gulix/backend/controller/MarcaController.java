@@ -15,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -38,6 +39,7 @@ public class MarcaController {
         return ResponseEntity.ok(marcaService.getMarcaById(marcaId));
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
     public ResponseEntity<MarcaResponseDTO> createNewMarca(@RequestBody MarcaRequestDTO marcaRequest) {
 
@@ -50,6 +52,7 @@ public class MarcaController {
         return ResponseEntity.status(HttpStatus.CREATED).headers(headers).body(response);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{marcaId}")
     public ResponseEntity<MarcaResponseDTO> updateMarcaById(@PathVariable("marcaId") Integer marcaId, @RequestBody MarcaRequestDTO marcaAtualizar) {
 
@@ -59,6 +62,7 @@ public class MarcaController {
 
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{marcaId}")
     public ResponseEntity<Void> deleteMarcaById(@PathVariable Integer marcaId) {
 
