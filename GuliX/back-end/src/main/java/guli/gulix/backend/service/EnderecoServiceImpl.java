@@ -4,7 +4,9 @@ import guli.gulix.backend.dto.EnderecoCreateDTO;
 import guli.gulix.backend.dto.EnderecoResponseDTO;
 import guli.gulix.backend.dto.EnderecoUpdateDTO;
 import guli.gulix.backend.entity.Endereco;
+import guli.gulix.backend.entity.Usuario;
 import guli.gulix.backend.exception.RecursoNaoEncontradoException;
+import guli.gulix.backend.exception.RegraNegocioException;
 import guli.gulix.backend.mapper.EnderecoMapper;
 import guli.gulix.backend.repository.EnderecoRepository;
 import lombok.RequiredArgsConstructor;
@@ -23,57 +25,59 @@ public class EnderecoServiceImpl implements EnderecoService{
 
     @Override
     @Transactional(readOnly = true)
-    public List<EnderecoResponseDTO> getListEnderecos() {  // passar usuarioId
-            return enderecoRepository.findByUsuarioId().stream().map(enderecoMapper::toDTO).toList();
+    public List<EnderecoResponseDTO> getListEnderecos(Usuario usuarioLogado) {  // passar usuarioId
+            return enderecoRepository.findByUsuarioId(usuarioLogado.getId()).stream().map(enderecoMapper::toDTO).toList();
     }
 
     @Override
     @Transactional(readOnly = true)
-    public EnderecoResponseDTO getEnderecoById(Integer enderecoId) {
+    public EnderecoResponseDTO getEnderecoById(Integer enderecoId, Usuario usuarioLogado) {
             Endereco endereco = enderecoRepository.findById(enderecoId)
                     .orElseThrow(()->
                             new RecursoNaoEncontradoException(
                                     "Endereço com id " + enderecoId + " não encontrado"
                             ));
 
+
+            validarDono(endereco, usuarioLogado);
+
             return enderecoMapper.toDTO(endereco);
     }
 
     @Override
-    public EnderecoResponseDTO createNewEndereco(EnderecoCreateDTO enderecoRequest) { // adicionar Usuario usuarioLogado
+    public EnderecoResponseDTO createNewEndereco(EnderecoCreateDTO enderecoRequest, Usuario usuarioLogado) { // adicionar Usuario usuarioLogado
         Endereco endereco = enderecoMapper.toEntity(enderecoRequest);
 
-        // endereco.setUsuario(usuarioLogado)
+         endereco.setUsuario(usuarioLogado);
 
-        // validaPrimeiroEndereco(usuarioLogado.getId(), endereco);
+         validaPrimeiroEndereco(usuarioLogado.getId(), endereco);
 
         return enderecoMapper.toDTO(enderecoRepository.save(endereco));
-
-
-        //
-
-
 
     }
 
     @Override
-    public void deleteEnderecoById(Integer enderecoId) {
+    public void deleteEnderecoById(Integer enderecoId, Usuario usuarioLogado) {
         Endereco endereco = enderecoRepository.findById(enderecoId)
                 .orElseThrow(()->
                         new RecursoNaoEncontradoException(
                                 "Endereço com id " + enderecoId + " não encontrado"
                         ));
+
+        validarDono(endereco, usuarioLogado);
 
         enderecoRepository.delete(endereco);
     }
 
     @Override
-    public EnderecoResponseDTO updateEnderecoById(Integer enderecoId, EnderecoUpdateDTO enderecotualizar) {
+    public EnderecoResponseDTO updateEnderecoById(Integer enderecoId, EnderecoUpdateDTO enderecotualizar, Usuario usuarioLogado) {
         Endereco endereco = enderecoRepository.findById(enderecoId)
                 .orElseThrow(()->
                         new RecursoNaoEncontradoException(
                                 "Endereço com id " + enderecoId + " não encontrado"
                         ));
+
+        validarDono(endereco, usuarioLogado);
 
         enderecoMapper.updateFromDto(enderecotualizar, endereco);
 
@@ -81,16 +85,18 @@ public class EnderecoServiceImpl implements EnderecoService{
     }
 
     @Override
-    public void updateEnderecoPrincipalById(Integer enderecoId) {
+    public void updateEnderecoPrincipalById(Integer enderecoId, Usuario usuarioLogado) {
         Endereco enderecoExiste = enderecoRepository.findById(enderecoId)
                 .orElseThrow(()->
                         new RecursoNaoEncontradoException(
                                 "Endereço com id " + enderecoId + " não encontrado"
                         ));
 
-        List<Endereco> listaEnderecos = enderecoRepository.findByUsuarioId(enderecoExiste.getUsuario().getId());
+        validarDono(enderecoExiste, usuarioLogado);
 
-       limpaPrincipal(listaEnderecos);
+        List<Endereco> listaEnderecos = enderecoRepository.findByUsuarioId(usuarioLogado.getId());
+
+        limpaPrincipal(listaEnderecos);
 
         enderecoExiste.setPrincipal(true);
     }
@@ -101,11 +107,17 @@ public class EnderecoServiceImpl implements EnderecoService{
         }
     }
 
-    private void validaPrimeiroEndereco(Usuario usuarioLogado, Endereco endereco) {
+    private void validaPrimeiroEndereco(Integer usuarioId, Endereco endereco) {
         List<Endereco> enderecos = enderecoRepository.findByUsuarioId(usuarioId);
 
         if (enderecos.isEmpty()) {
             endereco.setPrincipal(true);
+        }
+    }
+
+    private void validarDono(Endereco endereco, Usuario usuarioLogado) {
+        if(!endereco.getUsuario().getId().equals(usuarioLogado.getId())) {
+            throw new RegraNegocioException("Acesso negado");
         }
     }
 
