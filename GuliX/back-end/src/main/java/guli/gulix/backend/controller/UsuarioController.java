@@ -1,5 +1,6 @@
 package guli.gulix.backend.controller;
 
+import guli.gulix.backend.dto.UsuarioAdminResponseDTO;
 import guli.gulix.backend.dto.UsuarioCreateDTO;
 import guli.gulix.backend.dto.UsuarioResponseDTO;
 import guli.gulix.backend.dto.UsuarioUpdateDTO;
@@ -26,9 +27,9 @@ public class UsuarioController {
 
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping
-    public ResponseEntity<List<UsuarioResponseDTO>> getListUsuario() {
+    public ResponseEntity<List<UsuarioAdminResponseDTO>> getListUsuario() {
 
-        List<UsuarioResponseDTO> response = usuarioService.getListUsuario();
+        List<UsuarioAdminResponseDTO> response = usuarioService.getListUsuario();
 
         return ResponseEntity.ok(response);
     }

@@ -1,5 +1,6 @@
 package guli.gulix.backend.mapper;
 
+import guli.gulix.backend.dto.UsuarioAdminResponseDTO;
 import guli.gulix.backend.dto.UsuarioCreateDTO;
 import guli.gulix.backend.dto.UsuarioResponseDTO;
 import guli.gulix.backend.dto.UsuarioUpdateDTO;
@@ -16,4 +17,6 @@ public interface UsuarioMapper {
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     void updateEntityfromDTO(UsuarioUpdateDTO dto, @MappingTarget Usuario usuario);
+
+    UsuarioAdminResponseDTO toDTOAdmin(Usuario usuario);
 }

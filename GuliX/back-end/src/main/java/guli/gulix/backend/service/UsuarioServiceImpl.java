@@ -1,5 +1,6 @@
 package guli.gulix.backend.service;
 
+import guli.gulix.backend.dto.UsuarioAdminResponseDTO;
 import guli.gulix.backend.dto.UsuarioCreateDTO;
 import guli.gulix.backend.dto.UsuarioResponseDTO;
 import guli.gulix.backend.dto.UsuarioUpdateDTO;
@@ -26,8 +27,8 @@ public class UsuarioServiceImpl implements UsuarioService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<UsuarioResponseDTO> getListUsuario() {
-        return usuarioRepository.findAll().stream().map(usuarioMapper::toDTO).toList();
+    public List<UsuarioAdminResponseDTO> getListUsuario() {
+        return usuarioRepository.findAll().stream().map(usuarioMapper::toDTOAdmin).toList();
     }
 
     @Override

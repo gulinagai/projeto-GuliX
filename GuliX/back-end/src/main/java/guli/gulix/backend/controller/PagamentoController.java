@@ -10,41 +10,41 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-@RequiredArgsConstructor
-@RestController
-@RequestMapping("/api/v1/pagamentos")
-public class PagamentoController {
-
-    private final PagamentoService pagamentoService;
-
-    // criar pagamento
-    @PostMapping
-    public ResponseEntity<PagamentoResponseDTO> criarPagamento(
-            @RequestBody PagamentoRequestDTO dto,
-            @AuthenticationPrincipal Usuario usuario
-    ) {
-        PagamentoResponseDTO response = pagamentoService.criarPagamento(dto, usuario);
-
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
-    }
-
-    // buscar pagamento
-    @GetMapping("/{pagamentoId}")
-    public ResponseEntity<PagamentoResponseDTO> getPagamentoById(
-            @PathVariable Integer pagamentoId,
-            @AuthenticationPrincipal Usuario usuario
-    ) {
-        return ResponseEntity.ok(pagamentoService.getPagamentoById(pagamentoId, usuario));
-    }
-
-    // confirmar pagamento
-    @PatchMapping("/{pagamentoId}/confirmar")
-    public ResponseEntity<PagamentoResponseDTO> confirmarPagamento(
-            @PathVariable Integer pagamentoId,
-            @AuthenticationPrincipal Usuario usuario
-    ) {
-        return ResponseEntity.ok(
-                pagamentoService.confirmarPagamento(pagamentoId, usuario)
-        );
-    }
-}
+//@RequiredArgsConstructor
+//@RestController
+//@RequestMapping("/api/v1/pagamentos")
+//public class PagamentoController {
+//
+//    private final PagamentoService pagamentoService;
+//
+//    // criar pagamento
+//    @PostMapping
+//    public ResponseEntity<PagamentoResponseDTO> criarPagamento(
+//            @RequestBody PagamentoRequestDTO dto,
+//            @AuthenticationPrincipal Usuario usuario
+//    ) {
+//        PagamentoResponseDTO response = pagamentoService.criarPagamento(dto, usuario);
+//
+//        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+//    }
+//
+//    // buscar pagamento
+//    @GetMapping("/{pagamentoId}")
+//    public ResponseEntity<PagamentoResponseDTO> getPagamentoById(
+//            @PathVariable Integer pagamentoId,
+//            @AuthenticationPrincipal Usuario usuario
+//    ) {
+//        return ResponseEntity.ok(pagamentoService.getPagamentoById(pagamentoId, usuario));
+//    }
+//
+//    // confirmar pagamento
+//    @PatchMapping("/{pagamentoId}/confirmar")
+//    public ResponseEntity<PagamentoResponseDTO> confirmarPagamento(
+//            @PathVariable Integer pagamentoId,
+//            @AuthenticationPrincipal Usuario usuario
+//    ) {
+//        return ResponseEntity.ok(
+//                pagamentoService.confirmarPagamento(pagamentoId, usuario)
+//        );
+//    }
+//}
