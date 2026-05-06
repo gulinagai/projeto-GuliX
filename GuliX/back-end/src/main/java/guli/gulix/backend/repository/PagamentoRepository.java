@@ -1,4 +1,7 @@
 package guli.gulix.backend.repository;
 
-public interface PagamentoRepository {
+import guli.gulix.backend.entity.Pagamento;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface PagamentoRepository extends JpaRepository<Pagamento, Integer> {
 }
