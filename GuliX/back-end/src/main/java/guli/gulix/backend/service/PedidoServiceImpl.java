@@ -4,6 +4,7 @@ import guli.gulix.backend.dto.PedidoResponseDTO;
 import guli.gulix.backend.dto.PedidoUpdateStatusDTO;
 import guli.gulix.backend.entity.Pedido;
 import guli.gulix.backend.entity.Usuario;
+import guli.gulix.backend.entity.enums.Role;
 import guli.gulix.backend.entity.enums.StatusPedido;
 import guli.gulix.backend.exception.RecursoNaoEncontradoException;
 import guli.gulix.backend.exception.RegraNegocioException;
@@ -36,10 +37,23 @@ public class PedidoServiceImpl implements PedidoService {
     @Override
     public PedidoResponseDTO getPedidoById(Usuario usuario, Integer pedidoId) {
 
-        Pedido pedido = pedidoRepository.findById(pedidoId)
-                .orElseThrow(() -> new RecursoNaoEncontradoException("Pedido não encontrado"));
+        Pedido pedido;
 
-        validatePedidoOwner(pedido, usuario);
+        switch (usuario.getRole()) {
+            case Role.ROLE_ADMIN:
+                pedido = pedidoRepository.findById(pedidoId)
+                        .orElseThrow(() -> new RecursoNaoEncontradoException("Pedido não encontrado"));
+                break;
+
+            case Role.ROLE_USER:
+                pedido = pedidoRepository.findByIdAndUsuario(pedidoId, usuario)
+                        .orElseThrow(() -> new RecursoNaoEncontradoException("Pedido não encontrado"));
+                break;
+
+            default:
+                throw new RegraNegocioException("Role não autorizada");
+        }
+
 
         return pedidoMapper.toDTO(pedido);
     }

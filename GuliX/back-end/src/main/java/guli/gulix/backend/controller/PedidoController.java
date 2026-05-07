@@ -28,7 +28,7 @@ public class PedidoController {
         return ResponseEntity.ok(pedidoService.getListPedidos(usuario));
     }
 
-    // usuario - listar um pedido do usuario baseado no id
+    // usuario - listar um pedido do usuario baseado no id (acesso liberado para admin e user)
     @GetMapping("/{pedidoId}")
     public ResponseEntity<PedidoResponseDTO> getPedidoById(
             @AuthenticationPrincipal Usuario usuario,
