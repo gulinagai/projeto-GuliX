@@ -122,7 +122,7 @@ public class CarrinhoServiceImpl implements CarrinhoService {
     }
 
 
-    private BigDecimal calcularTotal(Carrinho carrinho) {
+    public BigDecimal calcularTotal(Carrinho carrinho) {
 
         if(carrinho.getItens() == null || carrinho.getItens().isEmpty()) {
             return BigDecimal.ZERO;

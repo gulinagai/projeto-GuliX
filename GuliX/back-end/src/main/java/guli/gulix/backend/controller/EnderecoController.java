@@ -40,9 +40,9 @@ public class EnderecoController {
     public ResponseEntity<EnderecoResponseDTO> createNewEndereco(
             @RequestBody EnderecoCreateDTO enderecoRequest,
             @AuthenticationPrincipal Usuario usuario
-    ) { // adicionar @AuthenticationPrincipal Usuario usuarioLogado quando implementar autenticação
+    ) {
 
-        EnderecoResponseDTO novoEndereco = enderecoService.createNewEndereco(enderecoRequest, usuario); // passar usuarioLogado também
+        EnderecoResponseDTO novoEndereco = enderecoService.createNewEndereco(enderecoRequest, usuario);
 
         HttpHeaders headers = new HttpHeaders();
 

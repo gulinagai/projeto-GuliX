@@ -1,14 +1,17 @@
 package guli.gulix.backend.service;
 
+import guli.gulix.backend.dto.PedidoCreateDTO;
 import guli.gulix.backend.dto.PedidoResponseDTO;
 import guli.gulix.backend.dto.PedidoUpdateStatusDTO;
-import guli.gulix.backend.entity.Pedido;
-import guli.gulix.backend.entity.Usuario;
+import guli.gulix.backend.entity.*;
 import guli.gulix.backend.entity.enums.Role;
+import guli.gulix.backend.entity.enums.StatusPagamento;
 import guli.gulix.backend.entity.enums.StatusPedido;
 import guli.gulix.backend.exception.RecursoNaoEncontradoException;
 import guli.gulix.backend.exception.RegraNegocioException;
 import guli.gulix.backend.mapper.PedidoMapper;
+import guli.gulix.backend.repository.CarrinhoRepository;
+import guli.gulix.backend.repository.EnderecoRepository;
 import guli.gulix.backend.repository.PedidoRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -23,6 +26,10 @@ public class PedidoServiceImpl implements PedidoService {
 
     private final PedidoRepository pedidoRepository;
     private final PedidoMapper pedidoMapper;
+    private final CarrinhoRepository carrinhoRepository;
+    private final EnderecoRepository enderecoRepository;
+    private final CarrinhoService carrinhoService;
+    private final PagamentoService pagamentoService;
 
     // USER
 
@@ -59,13 +66,60 @@ public class PedidoServiceImpl implements PedidoService {
     }
 
     @Override
-    public PedidoResponseDTO createNewPedido(Usuario usuario) {
+    public PedidoResponseDTO createNewPedido(Usuario usuario, PedidoCreateDTO pedidoCreateDTO) {
 
-        Pedido pedido = new Pedido();
-        pedido.setUsuario(usuario);
-        pedido.setStatusPedido(StatusPedido.PENDENTE);
+        Pedido newPedido = new Pedido();
 
-        Pedido saved = pedidoRepository.save(pedido);
+        // buscar carrinho
+
+        Carrinho carrinho = carrinhoRepository.findByUsuarioId(usuario.getId())
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Carrinho não encontrado"));
+
+        // buscar para ver se o endereço passado para entrega existe no banco
+
+        Endereco enderecoExiste = enderecoRepository.findById(pedidoCreateDTO.getEnderecoId())
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Endereço não encontrado"));
+
+        // Mapping Pedido
+
+        newPedido.setUsuario(carrinho.getUsuario());
+        newPedido.setStatusPedido(StatusPedido.PENDENTE);
+        newPedido.setTotal(carrinhoService.calcularTotal(carrinho));
+
+        EnderecoEntrega enderecoEntrega = new EnderecoEntrega();
+
+        enderecoEntrega.setRua(enderecoExiste.getRua());
+        enderecoEntrega.setNumero(enderecoExiste.getNumero());
+        enderecoEntrega.setCep(enderecoExiste.getCep());
+        enderecoEntrega.setCidade(enderecoExiste.getCidade());
+        enderecoEntrega.setEstado(enderecoExiste.getEstado());
+
+        newPedido.setEnderecoEntrega(enderecoEntrega);
+
+
+        List<ItemPedido> itensPedido = carrinho.getItens().stream().map(
+                itemCarrinho -> {
+                    ItemPedido itemPedido = new ItemPedido();
+
+                    itemPedido.setProduto(itemCarrinho.getProduto());
+                    itemPedido.setQuantidade(itemCarrinho.getQuantidade());
+                    itemPedido.setPrecoUnitario(itemCarrinho.getProduto().getPreco());
+                    itemPedido.setPedido(newPedido);
+
+                    return itemPedido;
+                }
+        ).toList();
+
+
+
+        // Mapping Pagamento
+
+        pagamentoService.criarPagamento(newPedido, pedidoCreateDTO);
+
+
+
+
+        Pedido saved = pedidoRepository.save(newPedido);
 
         return pedidoMapper.toDTO(saved);
     }

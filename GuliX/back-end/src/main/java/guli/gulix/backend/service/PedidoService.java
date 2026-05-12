@@ -1,5 +1,6 @@
 package guli.gulix.backend.service;
 
+import guli.gulix.backend.dto.PedidoCreateDTO;
 import guli.gulix.backend.dto.PedidoResponseDTO;
 import guli.gulix.backend.dto.PedidoUpdateStatusDTO;
 import guli.gulix.backend.entity.Usuario;
@@ -11,7 +12,7 @@ public interface PedidoService {
 
     PedidoResponseDTO getPedidoById(Usuario usuario, Integer pedidoId);
 
-    PedidoResponseDTO createNewPedido(Usuario usuario);
+    PedidoResponseDTO createNewPedido(Usuario usuario, PedidoCreateDTO pedidoCreate);
 
     PedidoResponseDTO cancelPedido(Integer pedidoId, Usuario usuario);
 

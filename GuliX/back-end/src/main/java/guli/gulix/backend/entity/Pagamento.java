@@ -2,6 +2,7 @@ package guli.gulix.backend.entity;
 
 import guli.gulix.backend.entity.enums.MetodoPagamento;
 import guli.gulix.backend.entity.enums.StatusPagamento;
+import guli.gulix.backend.entity.enums.StatusPedido;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -37,8 +38,30 @@ public class Pagamento {
     @Column(name = "status", nullable = false)
     private StatusPagamento statusPagamento;
 
-    @Column(nullable = false, precision = 10, scale = 2)
-    private BigDecimal valor;
+    @Column(name = "valor_original",
+            nullable = false,
+            precision = 10,
+            scale = 2)
+    private BigDecimal valorOriginal;
+
+    @Column(nullable = false,
+            precision = 10,
+            scale = 2)
+    private BigDecimal desconto;
+
+    @Column(name = "valor_final",
+            nullable = false,
+            precision = 10,
+            scale = 2)
+    private BigDecimal valorFinal;
+
+    @Column(name = "numero_parcelas")
+    private Integer numeroParcelas;
+
+    @Column(name = "valor_parcela",
+            precision = 10,
+            scale = 2)
+    private BigDecimal valorParcela;
 
     @CreationTimestamp
     @Column(name = "criado_em", updatable = false)
@@ -47,4 +70,16 @@ public class Pagamento {
     @UpdateTimestamp
     @Column(name = "atualizado_em")
     private LocalDateTime atualizadoEm;
+
+    @PrePersist
+    public void prePersist() {
+        if (statusPagamento == null) {
+            statusPagamento = StatusPagamento.PENDENTE;
+        }
+
+        if(metodoPagamento != MetodoPagamento.CARTAO_CREDITO) {
+            numeroParcelas = null;
+            valorParcela = null;
+        }
+    }
 }

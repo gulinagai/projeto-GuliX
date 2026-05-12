@@ -1,7 +1,9 @@
 package guli.gulix.backend.controller;
 
+import guli.gulix.backend.dto.PedidoCreateDTO;
 import guli.gulix.backend.dto.PedidoResponseDTO;
 import guli.gulix.backend.dto.PedidoUpdateStatusDTO;
+import guli.gulix.backend.entity.Pedido;
 import guli.gulix.backend.entity.Usuario;
 import guli.gulix.backend.service.PedidoService;
 import lombok.RequiredArgsConstructor;
@@ -41,10 +43,11 @@ public class PedidoController {
     // usuario - novo pedido
     @PostMapping
     public ResponseEntity<PedidoResponseDTO> createNewPedido(
-            @AuthenticationPrincipal Usuario usuario
-    ) {
+            @AuthenticationPrincipal Usuario usuario,
+            @RequestBody PedidoCreateDTO pedidoCreate
+            ) {
 
-        PedidoResponseDTO response = pedidoService.createNewPedido(usuario);
+        PedidoResponseDTO response = pedidoService.createNewPedido(usuario, pedidoCreate);
 
         HttpHeaders headers = new HttpHeaders();
 
