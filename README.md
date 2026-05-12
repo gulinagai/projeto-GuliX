@@ -4,7 +4,7 @@ GuliX - E-commerce de Hardwares
 API backend de um sistema de e-commerce.
 
 ## Status
--  Backend: completo
+-  Backend: Completo
 -  Frontend: em desenvolvimento
 
 ## Principais tecnologias utilizadas:
@@ -16,7 +16,7 @@ API backend de um sistema de e-commerce.
 # Autenticação e Autorização:
 - JWT/Spring Security
 
-## ✅ Funcionalidades
+## Funcionalidades
 - Registro e login de usuário
 - Autenticação e autorização
 - CRUD
@@ -25,10 +25,11 @@ API backend de um sistema de e-commerce.
 - Sistema de carrinho
 
 
-## 🧪 Como testar
+## Como testar
 - Postman / Insomnia
 - (Opcional) Swagger
 
-## 📌 Observações
-O backend está completo. 
-O front-end da aplicação está em desenvolvimento.
+## Observações
+Este projeto foi idealizado como um E-ccomerce Full Stack.
+O backend está completo e funcional. Há commits de ajustes finos frequentemente. 
+O frontend está parcialmente implementado e será refinado.
