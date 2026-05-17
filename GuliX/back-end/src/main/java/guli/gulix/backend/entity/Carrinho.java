@@ -1,5 +1,7 @@
 package guli.gulix.backend.entity;
 
+import guli.gulix.backend.entity.enums.StatusCarrinho;
+import guli.gulix.backend.entity.enums.StatusPedido;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -19,7 +21,6 @@ import java.util.List;
 @Entity
 @Table(name = "carrinho")
 public class Carrinho {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
@@ -36,6 +37,6 @@ public class Carrinho {
     @Column(name = "atualizado_em")
     private LocalDateTime atualizadoEm;
 
-    @OneToMany(mappedBy = "carrinho", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "carrinho", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ItemCarrinho> itens = new ArrayList<>();
 }

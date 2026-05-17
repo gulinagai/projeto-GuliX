@@ -7,6 +7,7 @@ import guli.gulix.backend.entity.Carrinho;
 import guli.gulix.backend.entity.ItemCarrinho;
 import guli.gulix.backend.entity.Produto;
 import guli.gulix.backend.entity.Usuario;
+import guli.gulix.backend.entity.enums.StatusCarrinho;
 import guli.gulix.backend.exception.RecursoNaoEncontradoException;
 import guli.gulix.backend.exception.RegraNegocioException;
 import guli.gulix.backend.mapper.CarrinhoMapper;

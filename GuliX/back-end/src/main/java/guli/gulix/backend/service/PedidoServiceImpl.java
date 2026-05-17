@@ -110,6 +110,8 @@ public class PedidoServiceImpl implements PedidoService {
                 }
         ).toList();
 
+        newPedido.setItens(itensPedido);
+
 
 
         // Mapping Pagamento
@@ -120,6 +122,8 @@ public class PedidoServiceImpl implements PedidoService {
 
 
         Pedido saved = pedidoRepository.save(newPedido);
+
+        carrinho.getItens().clear();
 
         return pedidoMapper.toDTO(saved);
     }

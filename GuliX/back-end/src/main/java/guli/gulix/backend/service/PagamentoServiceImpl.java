@@ -172,8 +172,6 @@ public class PagamentoServiceImpl implements PagamentoService {
     }
 
     private void validateAccess(Pedido pedido, Usuario usuario) {
-
-
         if (usuario.getRole().name().equals("ADMIN")) {
             return;
         }
