@@ -57,7 +57,7 @@ public class JwtFilter extends OncePerRequestFilter {
             }
         }
 
-        filterChain.doFilter(request, response);
+        filterChain.doFilter(request, response); // significa que o filtro realizado no JwtFilter terminou. um metodo que diz para continuar a execução da cadeia de filtros
     }
 }
 // Dentro do Spring, agora pode acessar:

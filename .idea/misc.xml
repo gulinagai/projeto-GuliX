@@ -5,6 +5,7 @@
     <option name="originalFiles">
       <list>
         <option value="$PROJECT_DIR$/GuliX/back-end/pom.xml" />
+        <option value="$PROJECT_DIR$/GuliX/backend/pom.xml" />
       </list>
     </option>
   </component>
