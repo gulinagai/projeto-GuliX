@@ -2,6 +2,7 @@ package guli.gulix.backend.controller;
 
 import guli.gulix.backend.dto.ProdutoCreateDTO;
 import guli.gulix.backend.dto.ProdutoResponseDTO;
+import guli.gulix.backend.dto.ProdutoUpdateDTO;
 import guli.gulix.backend.exception.RecursoNaoEncontradoException;
 import guli.gulix.backend.fixture.ProdutoFixture;
 import guli.gulix.backend.repository.UsuarioRepository;
@@ -21,9 +22,8 @@ import java.util.List;
 
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(ProdutoController.class) // sobe um contexto de teste focado na camada MVC
@@ -104,6 +104,8 @@ class ProdutoControllerTest {
                 .andExpect(jsonPath("$[0].destaque").value(produtoEsperado.getDestaque()))
                 .andExpect(jsonPath("$[0].desconto").value(produtoEsperado.getDesconto().doubleValue()));
 
+
+        verify(produtoService).getAllProduto();
     }
 
 
@@ -123,6 +125,9 @@ class ProdutoControllerTest {
         // Assert
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isEmpty());
+
+
+        verify(produtoService).getAllProduto();
     }
 
 
@@ -156,6 +161,7 @@ class ProdutoControllerTest {
                 .andExpect(jsonPath("$.desconto").value(produtoEsperado.getDesconto().doubleValue()));
 
 
+        verify(produtoService).getProdutoById(1);
     }
 
     @Test
@@ -173,6 +179,8 @@ class ProdutoControllerTest {
 
                 .andExpect(status().isNotFound());
 
+
+        verify(produtoService).getProdutoById(0);
     }
 
     // createNewProduto(@RequestBody ProdutoCreateDTO produtoRequest)
@@ -215,8 +223,102 @@ class ProdutoControllerTest {
                 .andExpect(jsonPath("$.marcaId").value(produtoEsperado.getMarcaId()))
                 .andExpect(jsonPath("$.destaque").value(produtoEsperado.getDestaque()))
                 .andExpect(jsonPath("$.desconto").value(produtoEsperado.getDesconto().doubleValue()));
+
+
+        verify(produtoService).createNewProduto(any(ProdutoCreateDTO.class));
     }
 
+    @Test
+    void deveRetornar400QuandoDTOInvalido() throws Exception {
+
+
+        // Arrange
+
+        ProdutoCreateDTO produtoACriar = ProdutoFixture.produtoCreateDTO();
+        produtoACriar.setNome("");
+
+        // Act
+
+        mockMvc.perform(post("/api/v1/produtos")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(produtoACriar))) // usa o produtoCreateDTO e converte ele para json para passar na requisição.
+
+
+                // Assert
+
+                .andExpect(status().isBadRequest());
+
+        verifyNoInteractions(produtoService);
+
+    }
+
+
+
+    // deleteProdutoById(@PathVariable("produtoId")
+
+    @Test
+    void deveRetornar204AoDeletarProdutoPorId() throws Exception {
+
+        // Arrange
+
+            // Não necessário neste teste.
+
+        // Act
+
+        mockMvc.perform(
+                delete("/api/v1/produtos/1")
+        )
+
+        // Assert
+
+                .andExpect(status().isNoContent());
+
+
+        verify(produtoService).deleteProdutoById(1);
+    }
+
+    @Test
+    void deveRetornar404AoDeletarProdutoInexistente() throws Exception {
+
+        // Arrange
+
+        doThrow(new RecursoNaoEncontradoException("Produto com id 0 não encontrado"))
+                .when(produtoService).deleteProdutoById(0);
+
+        // Act
+
+        mockMvc.perform(
+                delete("/api/v1/produtos/0")
+        )
+
+        // Assert
+
+                .andExpect(status().isNotFound());
+
+        verify(produtoService).deleteProdutoById(0);
+
+    }
+
+
+    // updateProdutoById(@PathVariable("produtoId")
+
+//    @Test
+//    void deveRetornar200AoAtualizarCompletamenteProdutoPorId() {
+//
+//        // Arrange
+//
+//        ProdutoResponseDTO produtoEsperado = ProdutoFixture.produtoResponseDTO();
+//        ProdutoUpdateDTO produtoAtualizar = ProdutoFixture.produtoUpdateDTO();
+//
+//
+//        when(produtoService.updateProdutoById(1, produtoAtualizar)).thenReturn(produtoEsperado);
+//
+//        // Act
+//
+//
+//        // Assert
+
+    }
 
 }
 
