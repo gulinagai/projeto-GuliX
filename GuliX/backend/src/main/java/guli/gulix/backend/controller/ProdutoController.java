@@ -7,6 +7,7 @@ import guli.gulix.backend.entity.Produto;
 import guli.gulix.backend.mapper.ProdutoMapper;
 import guli.gulix.backend.repository.ProdutoRepository;
 import guli.gulix.backend.service.ProdutoService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.apache.coyote.Response;
 import org.springframework.http.HttpHeaders;
@@ -35,7 +36,7 @@ public class ProdutoController {
 
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
-    public ResponseEntity<ProdutoResponseDTO> createNewProduto(@RequestBody ProdutoCreateDTO produtoRequest) {
+    public ResponseEntity<ProdutoResponseDTO> createNewProduto(@Valid @RequestBody ProdutoCreateDTO produtoRequest) {
 
         ProdutoResponseDTO novoProduto = produtoService.createNewProduto(produtoRequest);
 
@@ -56,7 +57,7 @@ public class ProdutoController {
 
     @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{produtoId}")
-    public ResponseEntity<ProdutoResponseDTO> updateProdutoById(@PathVariable("produtoId") Integer produtoId, @RequestBody ProdutoUpdateDTO produtoAtualizar) {
+    public ResponseEntity<ProdutoResponseDTO> updateProdutoById(@PathVariable("produtoId") Integer produtoId, @Valid @RequestBody ProdutoUpdateDTO produtoAtualizar) {
 
         ProdutoResponseDTO produtoAtualizado = produtoService.updateProdutoById(produtoId, produtoAtualizar);
 
@@ -64,7 +65,7 @@ public class ProdutoController {
     }
 
     @PatchMapping("/{produtoId}")
-    public ResponseEntity<ProdutoResponseDTO> updatePartialProdutoById(@PathVariable("produtoId") Integer produtoId, @RequestBody ProdutoUpdateDTO produtoAtualizar) {
+    public ResponseEntity<ProdutoResponseDTO> updatePartialProdutoById(@PathVariable("produtoId") Integer produtoId, @Valid @RequestBody ProdutoUpdateDTO produtoAtualizar) {
 
         ProdutoResponseDTO produtoAtualizado = produtoService.updatePartialProdutoById(produtoId, produtoAtualizar);
 
