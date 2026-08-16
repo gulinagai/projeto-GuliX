@@ -1,6 +1,7 @@
 package guli.gulix.backend.mapper;
 
 import guli.gulix.backend.dto.ProdutoCreateDTO;
+import guli.gulix.backend.dto.ProdutoPatchDTO;
 import guli.gulix.backend.dto.ProdutoResponseDTO;
 import guli.gulix.backend.dto.ProdutoUpdateDTO;
 import guli.gulix.backend.entity.Produto;
@@ -20,10 +21,15 @@ public interface ProdutoMapper {
     @Mapping(source = "marca.id", target = "marcaId")
     ProdutoResponseDTO toDTO(Produto produto);
 
-    // Update (PATCH/PUT)
-    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    // Update (PUT)
     @Mapping(target = "categoria", ignore = true)
     @Mapping(target = "marca", ignore = true)
     void updateEntityFromDto(ProdutoUpdateDTO dto, @MappingTarget Produto produto);
+
+    // Update (PATCH)
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    @Mapping(target = "categoria", ignore = true)
+    @Mapping(target = "marca", ignore = true)
+    void patchEntityFromDto(ProdutoPatchDTO dto, @MappingTarget Produto produto);
 
 }

@@ -1,6 +1,7 @@
 package guli.gulix.backend.controller;
 
 import guli.gulix.backend.dto.ProdutoCreateDTO;
+import guli.gulix.backend.dto.ProdutoPatchDTO;
 import guli.gulix.backend.dto.ProdutoResponseDTO;
 import guli.gulix.backend.dto.ProdutoUpdateDTO;
 import guli.gulix.backend.entity.Produto;
@@ -65,7 +66,7 @@ public class ProdutoController {
     }
 
     @PatchMapping("/{produtoId}")
-    public ResponseEntity<ProdutoResponseDTO> updatePartialProdutoById(@PathVariable("produtoId") Integer produtoId, @Valid @RequestBody ProdutoUpdateDTO produtoAtualizar) {
+    public ResponseEntity<ProdutoResponseDTO> updatePartialProdutoById(@PathVariable("produtoId") Integer produtoId, @Valid @RequestBody ProdutoPatchDTO produtoAtualizar) {
 
         ProdutoResponseDTO produtoAtualizado = produtoService.updatePartialProdutoById(produtoId, produtoAtualizar);
 

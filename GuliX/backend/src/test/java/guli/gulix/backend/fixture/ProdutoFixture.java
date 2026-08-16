@@ -1,6 +1,7 @@
 package guli.gulix.backend.fixture;
 
 import guli.gulix.backend.dto.ProdutoCreateDTO;
+import guli.gulix.backend.dto.ProdutoPatchDTO;
 import guli.gulix.backend.dto.ProdutoResponseDTO;
 import guli.gulix.backend.dto.ProdutoUpdateDTO;
 import guli.gulix.backend.entity.Produto;
@@ -65,8 +66,8 @@ public final class ProdutoFixture {
         return dto;
     }
 
-    public static ProdutoUpdateDTO produtoUpdatePartialDTO() {
-        ProdutoUpdateDTO dto = new ProdutoUpdateDTO();
+    public static ProdutoPatchDTO produtoUpdatePartialDTO() {
+        ProdutoPatchDTO dto = new ProdutoPatchDTO();
 
         dto.setNome("Gabinete Gaming Teste");
         dto.setImagemURL("gabinete-gaming-teste-rgb-mid-tower-lateral-de-vidro-preto.jpg");

@@ -1,6 +1,7 @@
 package guli.gulix.backend.service;
 
 import guli.gulix.backend.dto.ProdutoCreateDTO;
+import guli.gulix.backend.dto.ProdutoPatchDTO;
 import guli.gulix.backend.dto.ProdutoResponseDTO;
 import guli.gulix.backend.dto.ProdutoUpdateDTO;
 import guli.gulix.backend.entity.Produto;
@@ -19,5 +20,5 @@ public interface ProdutoService {
 
     ProdutoResponseDTO updateProdutoById(Integer produtoId, ProdutoUpdateDTO produto);
 
-    ProdutoResponseDTO updatePartialProdutoById(Integer produtoId, ProdutoUpdateDTO produtoParcial);
+    ProdutoResponseDTO updatePartialProdutoById(Integer produtoId, ProdutoPatchDTO produtoParcial);
 }
