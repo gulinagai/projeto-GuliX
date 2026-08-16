@@ -1,6 +1,7 @@
 package guli.gulix.backend.service;
 
 import guli.gulix.backend.dto.ProdutoCreateDTO;
+import guli.gulix.backend.dto.ProdutoPatchDTO;
 import guli.gulix.backend.dto.ProdutoResponseDTO;
 import guli.gulix.backend.dto.ProdutoUpdateDTO;
 import guli.gulix.backend.entity.Produto;
@@ -46,7 +47,7 @@ public class ProdutoServiceImplTest {
     private Produto produto;
     private ProdutoCreateDTO produtoCreateDTO;
     private ProdutoUpdateDTO produtoUpdateDTO;
-    private ProdutoUpdateDTO produtoUpdatePartialDTO;
+    private ProdutoPatchDTO produtoUpdatePartialDTO;
     private ProdutoResponseDTO produtoResponseDTO;
 
     @BeforeEach
@@ -397,7 +398,7 @@ public class ProdutoServiceImplTest {
         assertEquals(produtoResponseDTO, resultado);
 
         verify(produtoRepository).findById(1);
-        verify(produtoMapper).updateEntityFromDto(produtoUpdatePartialDTO, produto);
+        verify(produtoMapper).patchEntityFromDto(produtoUpdatePartialDTO, produto);
         verify(categoriaRepository).findById(produtoUpdatePartialDTO.getCategoriaId());
         verify(marcaRepository).findById(produtoUpdatePartialDTO.getMarcaId());
         verify(produtoMapper).toDTO(produto);
@@ -424,7 +425,7 @@ public class ProdutoServiceImplTest {
         assertEquals(produtoResponseDTO, resultado);
 
         verify(produtoRepository).findById(1);
-        verify(produtoMapper).updateEntityFromDto(produtoUpdatePartialDTO, produto);
+        verify(produtoMapper).patchEntityFromDto(produtoUpdatePartialDTO, produto);
         verify(produtoMapper).toDTO(produto);
 
         verifyNoInteractions(categoriaRepository);
@@ -472,7 +473,7 @@ public class ProdutoServiceImplTest {
         assertEquals("Categoria com id 1 não encontrado", exception.getMessage());
 
         verify(produtoRepository).findById(1);
-        verify(produtoMapper).updateEntityFromDto(produtoUpdatePartialDTO, produto);
+        verify(produtoMapper).patchEntityFromDto(produtoUpdatePartialDTO, produto);
         verify(categoriaRepository).findById(produtoUpdatePartialDTO.getCategoriaId());
 
         verifyNoInteractions(marcaRepository);
@@ -498,7 +499,7 @@ public class ProdutoServiceImplTest {
         assertEquals("Marca com id 1 não encontrado", exception.getMessage());
 
         verify(produtoRepository).findById(1);
-        verify(produtoMapper).updateEntityFromDto(produtoUpdatePartialDTO, produto);
+        verify(produtoMapper).patchEntityFromDto(produtoUpdatePartialDTO, produto);
         verify(categoriaRepository).findById(produtoUpdatePartialDTO.getCategoriaId());
         verify(marcaRepository).findById(produtoUpdatePartialDTO.getMarcaId());
 

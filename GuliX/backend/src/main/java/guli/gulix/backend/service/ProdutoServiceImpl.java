@@ -1,6 +1,7 @@
 package guli.gulix.backend.service;
 
 import guli.gulix.backend.dto.ProdutoCreateDTO;
+import guli.gulix.backend.dto.ProdutoPatchDTO;
 import guli.gulix.backend.dto.ProdutoResponseDTO;
 import guli.gulix.backend.dto.ProdutoUpdateDTO;
 import guli.gulix.backend.entity.Categoria;
@@ -127,7 +128,7 @@ public class ProdutoServiceImpl implements ProdutoService {
     }
 
     @Override
-    public ProdutoResponseDTO updatePartialProdutoById(Integer produtoId, ProdutoUpdateDTO produtoAtualizar) {
+    public ProdutoResponseDTO updatePartialProdutoById(Integer produtoId, ProdutoPatchDTO produtoAtualizar) {
 
         Produto produto = produtoRepository.findById(produtoId)
                 .orElseThrow(()->
@@ -135,7 +136,7 @@ public class ProdutoServiceImpl implements ProdutoService {
                                 "Produto com id " + produtoId + " não encontrado"
                         ));
 
-        produtoMapper.updateEntityFromDto(produtoAtualizar, produto); // o Mapstruct gera todos os sets automaticamente! atualiza o que tiver para atualizar no objeto
+        produtoMapper.patchEntityFromDto(produtoAtualizar, produto); // o Mapstruct gera todos os sets automaticamente! atualiza o que tiver para atualizar no objeto
         // basta gravar no banco
         // o fato de no mapper existir tratamento para ignorar null, é exatamente o que seria feito abaixo manualmente:
 
