@@ -65,6 +65,7 @@ public class ProdutoController {
         return ResponseEntity.ok(produtoAtualizado);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PatchMapping("/{produtoId}")
     public ResponseEntity<ProdutoResponseDTO> updatePartialProdutoById(@PathVariable("produtoId") Integer produtoId, @Valid @RequestBody ProdutoPatchDTO produtoAtualizar) {
 
