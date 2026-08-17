@@ -34,8 +34,8 @@ public class CategoriaController {
         return ResponseEntity.ok(categoriaService.getCategoriaById(categoriaId));
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<CategoriaResponseDTO> createNewCategoria(@RequestBody CategoriaRequestDTO categoriaRequest) {
 
         CategoriaResponseDTO response = categoriaService.createNewCategoria(categoriaRequest);
@@ -48,8 +48,8 @@ public class CategoriaController {
 
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{categoriaId}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<CategoriaResponseDTO> updateCategoriaById(@PathVariable("categoriaId") Integer categoriaId, @RequestBody CategoriaRequestDTO categoriaAtualizar) {
 
         CategoriaResponseDTO response = categoriaService.updateCategoriaById(categoriaId, categoriaAtualizar);
@@ -58,8 +58,8 @@ public class CategoriaController {
 
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{categoriaId}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> deleteCategoriaById(@PathVariable Integer categoriaId) {
 
         categoriaService.deleteCategoriaById(categoriaId);

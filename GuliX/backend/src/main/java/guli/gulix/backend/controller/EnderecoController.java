@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,6 +23,7 @@ public class EnderecoController {
     private final EnderecoService enderecoService;
 
     @GetMapping
+    @PreAuthorize("hasRole('USER')")
     public ResponseEntity<List<EnderecoResponseDTO>> getListEnderecos(
             @AuthenticationPrincipal Usuario usuario
             ) {
@@ -29,6 +31,7 @@ public class EnderecoController {
     }
 
     @GetMapping("/{enderecoId}")
+    @PreAuthorize("hasRole('USER')")
     public ResponseEntity<EnderecoResponseDTO> getEnderecoById(
             @PathVariable("enderecoId") Integer enderecoId,
             @AuthenticationPrincipal Usuario usuario
@@ -37,6 +40,7 @@ public class EnderecoController {
     }
 
     @PostMapping
+    @PreAuthorize("hasRole('USER')")
     public ResponseEntity<EnderecoResponseDTO> createNewEndereco(
             @RequestBody EnderecoCreateDTO enderecoRequest,
             @AuthenticationPrincipal Usuario usuario
@@ -51,8 +55,8 @@ public class EnderecoController {
         return ResponseEntity.status(HttpStatus.CREATED).headers(headers).body(novoEndereco);
     }
 
-
     @DeleteMapping("/{enderecoId}")
+    @PreAuthorize("hasRole('USER')")
     public ResponseEntity<Void> deleteEnderecoById(
             @PathVariable("enderecoId") Integer enderecoId,
             @AuthenticationPrincipal Usuario usuario
@@ -63,6 +67,7 @@ public class EnderecoController {
     }
 
     @PutMapping("/{enderecoId}")
+    @PreAuthorize("hasRole('USER')")
     public ResponseEntity<EnderecoResponseDTO> updateEnderecoById(
             @PathVariable("enderecoId") Integer enderecoId,
             @RequestBody EnderecoUpdateDTO enderecoAtualizar,
@@ -74,8 +79,8 @@ public class EnderecoController {
         return ResponseEntity.ok(enderecoAtualizado);
     }
 
-
     @PatchMapping("/{enderecoId}/principal")
+    @PreAuthorize("hasRole('USER')")
     public ResponseEntity<Void> updateEnderecoPrincipalById(
             @PathVariable("enderecoId") Integer enderecoId,
             @AuthenticationPrincipal Usuario usuario

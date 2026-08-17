@@ -25,8 +25,8 @@ public class UsuarioController {
 
     private final UsuarioService usuarioService;
 
-    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<UsuarioAdminResponseDTO>> getListUsuario() {
 
         List<UsuarioAdminResponseDTO> response = usuarioService.getListUsuario();
@@ -34,15 +34,15 @@ public class UsuarioController {
         return ResponseEntity.ok(response);
     }
 
-    @PreAuthorize("hasRole('ADMIN') or #usuarioId == authentication.principal.id")
     @GetMapping("/{usuarioId}")
+    @PreAuthorize("hasRole('ADMIN') or #usuarioId == authentication.principal.id")
     public ResponseEntity<UsuarioResponseDTO> getUsuarioById(@PathVariable("usuarioId") Integer usuarioId) {
         return ResponseEntity.ok(usuarioService.getUsuarioById(usuarioId));
     }
 
 
-    @PreAuthorize("hasRole('ADMIN') or #usuarioId == authentication.principal.id")
     @PutMapping("/{usuarioId}")
+    @PreAuthorize("hasRole('ADMIN') or #usuarioId == authentication.principal.id")
     public ResponseEntity<UsuarioResponseDTO> updateUsuarioById(@PathVariable("usuarioId") Integer usuarioId, @RequestBody @Valid UsuarioUpdateDTO usuarioAtualizar) {
 
         UsuarioResponseDTO usuarioAtualizado = usuarioService.updateUsuarioById(usuarioId, usuarioAtualizar);
@@ -50,8 +50,8 @@ public class UsuarioController {
         return ResponseEntity.ok(usuarioAtualizado);
     }
 
-    @PreAuthorize("hasRole('ADMIN') or #usuarioId == authentication.principal.id")
     @PatchMapping("/{usuarioId}")
+    @PreAuthorize("hasRole('ADMIN') or #usuarioId == authentication.principal.id")
     public ResponseEntity<UsuarioResponseDTO> updatePatchUsuarioById(@PathVariable("usuarioId") Integer usuarioId, @RequestBody @Valid UsuarioUpdateDTO usuarioAtualizar) {
 
         UsuarioResponseDTO usuarioAtualizado = usuarioService.updatePatchUsuarioById(usuarioId, usuarioAtualizar);
@@ -59,8 +59,8 @@ public class UsuarioController {
         return ResponseEntity.ok(usuarioAtualizado);
     }
 
+    @DeleteMapping("/{usuarioId}")
     @PreAuthorize("hasRole('ADMIN')")
-    @DeleteMapping(("/{usuarioId}"))
     public ResponseEntity<Void> deleteUsuarioById(@PathVariable("usuarioId") Integer usuarioId) {
 
         usuarioService.deleteUsuarioById(usuarioId);

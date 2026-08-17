@@ -39,8 +39,8 @@ public class MarcaController {
         return ResponseEntity.ok(marcaService.getMarcaById(marcaId));
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<MarcaResponseDTO> createNewMarca(@RequestBody MarcaRequestDTO marcaRequest) {
 
         MarcaResponseDTO response = marcaService.createNewMarca(marcaRequest);
@@ -52,8 +52,8 @@ public class MarcaController {
         return ResponseEntity.status(HttpStatus.CREATED).headers(headers).body(response);
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{marcaId}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<MarcaResponseDTO> updateMarcaById(@PathVariable("marcaId") Integer marcaId, @RequestBody MarcaRequestDTO marcaAtualizar) {
 
         MarcaResponseDTO response = marcaService.updateMarcaById(marcaId, marcaAtualizar);
@@ -62,8 +62,8 @@ public class MarcaController {
 
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{marcaId}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> deleteMarcaById(@PathVariable Integer marcaId) {
 
         marcaService.deleteMarcaById(marcaId);

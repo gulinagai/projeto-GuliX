@@ -8,6 +8,7 @@ import guli.gulix.backend.service.CarrinhoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,6 +20,7 @@ public class CarrinhoController {
     private final CarrinhoService carrinhoService;
 
     @GetMapping
+    @PreAuthorize("hasRole('USER')")
     public ResponseEntity<CarrinhoResponseDTO> buscarCarrinho(
             @AuthenticationPrincipal Usuario usuario
     ) {
@@ -29,6 +31,7 @@ public class CarrinhoController {
     }
 
     @PostMapping("/itens")
+    @PreAuthorize("hasRole('USER')")
     public ResponseEntity<Void> adicionarItem(
             @AuthenticationPrincipal  Usuario usuario,
             @RequestBody ItemCarrinhoRequestDTO dto
@@ -37,8 +40,8 @@ public class CarrinhoController {
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
-
     @PutMapping("/itens/{itemId}")
+    @PreAuthorize("hasRole('USER')")
     public ResponseEntity<Void> atualizarQuantidade (
             @AuthenticationPrincipal Usuario usuario,
             @PathVariable Integer itemId,
@@ -48,9 +51,8 @@ public class CarrinhoController {
         return ResponseEntity.ok().build();
     }
 
-
-
     @DeleteMapping("/itens/{itemId}")
+    @PreAuthorize("hasRole('USER')")
     public ResponseEntity<Void> removerItem (
             @AuthenticationPrincipal Usuario usuario,
             @PathVariable Integer itemId

@@ -7,6 +7,7 @@ import guli.gulix.backend.service.PagamentoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,6 +23,7 @@ public class PagamentoController {
 
     // buscar pagamento
     @GetMapping("/{pagamentoId}")
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     public ResponseEntity<PagamentoResponseDTO> getPagamentoById(
             @PathVariable Integer pagamentoId,
             @AuthenticationPrincipal Usuario usuario
@@ -31,6 +33,7 @@ public class PagamentoController {
 
     // confirmar pagamento
     @PatchMapping("/{pagamentoId}/confirmar")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<PagamentoResponseDTO> confirmarPagamento(
             @PathVariable Integer pagamentoId,
             @AuthenticationPrincipal Usuario usuario
