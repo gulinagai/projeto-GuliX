@@ -35,8 +35,8 @@ public class ProdutoController {
         return ResponseEntity.ok(produtoService.getProdutoById(produtoId));
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ProdutoResponseDTO> createNewProduto(@Valid @RequestBody ProdutoCreateDTO produtoRequest) {
 
         ProdutoResponseDTO novoProduto = produtoService.createNewProduto(produtoRequest);
@@ -48,16 +48,16 @@ public class ProdutoController {
         return ResponseEntity.status(HttpStatus.CREATED).headers(headers).body(novoProduto);
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{produtoId}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> deleteProdutoById(@PathVariable("produtoId") Integer produtoId) {
         produtoService.deleteProdutoById(produtoId);
 
         return ResponseEntity.noContent().build();
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{produtoId}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ProdutoResponseDTO> updateProdutoById(@PathVariable("produtoId") Integer produtoId, @Valid @RequestBody ProdutoUpdateDTO produtoAtualizar) {
 
         ProdutoResponseDTO produtoAtualizado = produtoService.updateProdutoById(produtoId, produtoAtualizar);
@@ -65,8 +65,8 @@ public class ProdutoController {
         return ResponseEntity.ok(produtoAtualizado);
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
     @PatchMapping("/{produtoId}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ProdutoResponseDTO> updatePartialProdutoById(@PathVariable("produtoId") Integer produtoId, @Valid @RequestBody ProdutoPatchDTO produtoAtualizar) {
 
         ProdutoResponseDTO produtoAtualizado = produtoService.updatePartialProdutoById(produtoId, produtoAtualizar);

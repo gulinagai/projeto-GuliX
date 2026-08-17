@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,7 +24,9 @@ public class PedidoController {
     private final PedidoService pedidoService;
 
     // usuario - listar pedidos do usuario
+
     @GetMapping
+    @PreAuthorize("hasRole('USER')")
     public ResponseEntity<List<PedidoResponseDTO>> getListPedidos(
             @AuthenticationPrincipal Usuario usuario
             ) {
@@ -31,7 +34,9 @@ public class PedidoController {
     }
 
     // usuario - listar um pedido do usuario baseado no id (acesso liberado para admin e user)
+
     @GetMapping("/{pedidoId}")
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     public ResponseEntity<PedidoResponseDTO> getPedidoById(
             @AuthenticationPrincipal Usuario usuario,
             @PathVariable("pedidoId") Integer pedidoId
@@ -42,6 +47,7 @@ public class PedidoController {
 
     // usuario - novo pedido
     @PostMapping
+    @PreAuthorize("hasRole('USER')")
     public ResponseEntity<PedidoResponseDTO> createNewPedido(
             @AuthenticationPrincipal Usuario usuario,
             @RequestBody PedidoCreateDTO pedidoCreate
@@ -58,6 +64,7 @@ public class PedidoController {
 
     // usuario cancelar (status)
     @PatchMapping("/{pedidoId}/cancelar")
+    @PreAuthorize("hasRole('USER')")
     public ResponseEntity<PedidoResponseDTO> cancelPedido(
             @PathVariable("pedidoId") Integer pedidoId,
             @AuthenticationPrincipal Usuario usuario
@@ -70,12 +77,14 @@ public class PedidoController {
 
     // admin - listar todos os pedidos de todos
     @GetMapping("/admin")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<PedidoResponseDTO>> getAllPedidos() {
         return ResponseEntity.ok(pedidoService.getAllPedidos());
     }
 
     // admin atualizar (status)
     @PatchMapping("/admin/{pedidoId}/status")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<PedidoResponseDTO> updateStatusPedido(
             @PathVariable("pedidoId") Integer pedidoId,
             @RequestBody PedidoUpdateStatusDTO dto
