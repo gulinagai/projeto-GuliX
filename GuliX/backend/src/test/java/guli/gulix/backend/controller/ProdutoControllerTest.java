@@ -1,6 +1,7 @@
 package guli.gulix.backend.controller;
 
 import guli.gulix.backend.dto.ProdutoCreateDTO;
+import guli.gulix.backend.dto.ProdutoPatchDTO;
 import guli.gulix.backend.dto.ProdutoResponseDTO;
 import guli.gulix.backend.dto.ProdutoUpdateDTO;
 import guli.gulix.backend.exception.RecursoNaoEncontradoException;
@@ -17,6 +18,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import tools.jackson.databind.ObjectMapper;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 
@@ -187,6 +189,7 @@ class ProdutoControllerTest {
 
 
     @Test
+    @WithMockUser(roles = "ADMIN")
     void deveRetornar201QuandoProdutoCriado() throws Exception {
 
 
@@ -257,6 +260,7 @@ class ProdutoControllerTest {
     // deleteProdutoById(@PathVariable("produtoId")
 
     @Test
+    @WithMockUser(roles = "ADMIN")
     void deveRetornar204AoDeletarProdutoPorId() throws Exception {
 
         // Arrange
@@ -300,25 +304,194 @@ class ProdutoControllerTest {
     }
 
 
-    // updateProdutoById(@PathVariable("produtoId")
+     // updateProdutoById(@PathVariable("produtoId")
 
-//    @Test
-//    void deveRetornar200AoAtualizarCompletamenteProdutoPorId() {
-//
-//        // Arrange
-//
-//        ProdutoResponseDTO produtoEsperado = ProdutoFixture.produtoResponseDTO();
-//        ProdutoUpdateDTO produtoAtualizar = ProdutoFixture.produtoUpdateDTO();
-//
-//
-//        when(produtoService.updateProdutoById(1, produtoAtualizar)).thenReturn(produtoEsperado);
-//
-//        // Act
-//
-//
-//        // Assert
+    @Test
+    @WithMockUser(roles = "ADMIN")
+    void deveRetornar200AoAtualizarCompletamenteProdutoPorId() throws Exception {
 
-//    }
+        // Arrange
+
+        ProdutoResponseDTO produtoEsperado = ProdutoFixture.produtoResponseDTO();
+        ProdutoUpdateDTO produtoAtualizar = ProdutoFixture.produtoUpdateDTO();
+
+        produtoEsperado.setNome(produtoAtualizar.getNome());
+        produtoEsperado.setResumo(produtoAtualizar.getResumo());
+        produtoEsperado.setPreco(produtoAtualizar.getPreco());
+        produtoEsperado.setEstoque(produtoAtualizar.getEstoque());
+        produtoEsperado.setImagemURL(produtoAtualizar.getImagemURL());
+        produtoEsperado.setCategoriaId(produtoAtualizar.getCategoriaId());
+        produtoEsperado.setMarcaId(produtoAtualizar.getMarcaId());
+        produtoEsperado.setDestaque(produtoAtualizar.getDestaque());
+        produtoEsperado.setDesconto(produtoAtualizar.getDesconto());
+
+        when(produtoService.updateProdutoById(eq(1), any(ProdutoUpdateDTO.class))).thenReturn(produtoEsperado);
+
+        // Act
+
+        mockMvc.perform(
+                put("/api/v1/produtos/1")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(produtoAtualizar))
+        )
+
+        // Assert
+
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(produtoEsperado.getId()))
+                .andExpect(jsonPath("$.nome").value(produtoEsperado.getNome()))
+                .andExpect(jsonPath("$.resumo").value(produtoEsperado.getResumo()))
+                .andExpect(jsonPath("$.preco").value(produtoEsperado.getPreco().doubleValue()))
+                .andExpect(jsonPath("$.estoque").value(produtoEsperado.getEstoque()))
+                .andExpect(jsonPath("$.imagemURL").value(produtoEsperado.getImagemURL()))
+                .andExpect(jsonPath("$.categoriaId").value(produtoEsperado.getCategoriaId()))
+                .andExpect(jsonPath("$.marcaId").value(produtoEsperado.getMarcaId()))
+                .andExpect(jsonPath("$.destaque").value(produtoEsperado.getDestaque()))
+                .andExpect(jsonPath("$.desconto").value(produtoEsperado.getDesconto().doubleValue()));
+
+        verify(produtoService).updateProdutoById(eq(1), any(ProdutoUpdateDTO.class));
+
+    }
+
+    @Test
+    void deveRetornar400AoAtualizarComDTOInvalido() throws Exception {
+
+        // Arrange
+
+        ProdutoUpdateDTO produtoAtualizar = ProdutoFixture.produtoUpdateDTO();
+
+        produtoAtualizar.setNome(null);
+
+        // Act
+
+        mockMvc.perform(
+                put("/api/v1/produtos/1")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(produtoAtualizar))
+        )
+
+        // Assert
+
+                .andExpect(status().isBadRequest());
+
+
+        verifyNoInteractions(produtoService);
+    }
+
+    @Test
+    void deveRetornar404AoAtualizarProdutoComIdInexistente() throws Exception {
+
+        // Arrange
+
+        ProdutoUpdateDTO produtoAtualizar = ProdutoFixture.produtoUpdateDTO();
+
+        when(produtoService.updateProdutoById(eq(0), any(ProdutoUpdateDTO.class))).thenThrow(new RecursoNaoEncontradoException("Produto com id 0 não encontrado"));
+
+        // Act
+
+        mockMvc.perform(
+                put("/api/v1/produtos/0")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(produtoAtualizar))
+        )
+
+
+        // Assert
+
+                .andExpect(status().isNotFound());
+
+        verify(produtoService).updateProdutoById(
+                eq(0),
+                any(ProdutoUpdateDTO.class)
+        );
+
+    }
+
+    @Test
+    @WithMockUser(roles = "ADMIN")
+    void deveRetornar200AoAtualizarParcialProdutoPorId() throws Exception {
+
+        // Arrange
+
+        ProdutoPatchDTO produtoAtualizar = ProdutoFixture.produtoUpdatePartialDTO();
+        ProdutoResponseDTO produtoEsperado = ProdutoFixture.produtoResponseDTO();
+
+        produtoEsperado.setNome(produtoAtualizar.getNome());
+        produtoEsperado.setImagemURL(produtoAtualizar.getImagemURL());
+        produtoEsperado.setCategoriaId(produtoAtualizar.getCategoriaId());
+        produtoEsperado.setMarcaId(produtoAtualizar.getMarcaId());
+        produtoEsperado.setDestaque(produtoAtualizar.getDestaque());
+
+        when(produtoService.updatePartialProdutoById(eq(1), any(ProdutoPatchDTO.class))).thenReturn(produtoEsperado);
+
+        // Act
+
+        mockMvc.perform(
+                patch("/api/v1/produtos/1")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(produtoAtualizar))
+
+        )
+
+        // Assert
+
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.nome").value(produtoEsperado.getNome()))
+                .andExpect(jsonPath("$.imagemURL").value(produtoEsperado.getImagemURL()))
+                .andExpect(jsonPath("$.categoriaId").value(produtoEsperado.getCategoriaId()))
+                .andExpect(jsonPath("$.marcaId").value(produtoEsperado.getMarcaId()))
+                .andExpect(jsonPath("$.destaque").value(produtoEsperado.getDestaque()));
+
+        verify(produtoService).updatePartialProdutoById(eq(1), any(ProdutoPatchDTO.class));
+    }
+
+    @Test
+    void deveRetornar400AoAtualizarParcialComDTOInvalido() throws Exception {
+
+        // Arrange
+
+        ProdutoPatchDTO produtoAtualizar = ProdutoFixture.produtoUpdatePartialDTO();
+        produtoAtualizar.setPreco(new BigDecimal("-99.99"));
+
+        // Act
+
+        mockMvc.perform(
+                patch("/api/v1/produtos/1")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(produtoAtualizar))
+        )
+
+        // Assert
+
+                .andExpect(status().isBadRequest());
+
+        verifyNoInteractions(produtoService);
+
+    }
+
+    @Test
+    void deveRetornar404AoAtualizarParcialProdutoComIdInexistente() throws Exception {
+
+        // Arrange
+
+        ProdutoPatchDTO produtoAtualizar = ProdutoFixture.produtoUpdatePartialDTO();
+
+        when(produtoService.updatePartialProdutoById(eq(0), any(ProdutoPatchDTO.class))).thenThrow(new RecursoNaoEncontradoException("Produto com id 0 não encontrado"));
+        // Act
+
+        mockMvc.perform(
+                patch("/api/v1/produtos/0")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(produtoAtualizar))
+        )
+
+        // Assert
+
+
+                .andExpect(status().isNotFound());
+
+        verify(produtoService).updatePartialProdutoById(eq(0), any(ProdutoPatchDTO.class));
+    }
 
 }
 
