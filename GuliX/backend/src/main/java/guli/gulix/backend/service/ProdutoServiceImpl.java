@@ -12,11 +12,13 @@ import guli.gulix.backend.mapper.ProdutoMapper;
 import guli.gulix.backend.repository.CategoriaRepository;
 import guli.gulix.backend.repository.MarcaRepository;
 import guli.gulix.backend.repository.ProdutoRepository;
+import guli.gulix.backend.specification.ProdutoSpecification;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 @RequiredArgsConstructor
 @Service
@@ -30,8 +32,32 @@ public class ProdutoServiceImpl implements ProdutoService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<ProdutoResponseDTO> getAllProduto() {
-        return produtoRepository.findAll().stream().map(produtoMapper::toDTO).toList();
+    public Page<ProdutoResponseDTO> getAllProduto(String nome, Integer categoriaId, Integer marcaId, Pageable pageable) {
+
+        Specification<Produto> specification = (root, query, criteriaBuilder) -> null;
+
+        if (nome != null && !nome.isBlank()) {
+            specification = specification.and(
+                    ProdutoSpecification.nomeContainingIgnoreCase(nome)
+            );
+        }
+
+        if (categoriaId != null) {
+            specification = specification.and(
+                    ProdutoSpecification.categoriaIdEquals(categoriaId)
+            );
+        }
+
+        if (marcaId != null) {
+            specification = specification.and(
+                    ProdutoSpecification.marcaIdEquals(marcaId)
+            );
+        }
+
+        Page<Produto> produtos = produtoRepository.findAll(specification, pageable);
+
+        return produtos.map(produtoMapper::toDTO);
+
     }
 
     @Override

@@ -5,12 +5,14 @@ import guli.gulix.backend.dto.ProdutoPatchDTO;
 import guli.gulix.backend.dto.ProdutoResponseDTO;
 import guli.gulix.backend.dto.ProdutoUpdateDTO;
 import guli.gulix.backend.entity.Produto;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.Optional;
 
 public interface ProdutoService {
-    List<ProdutoResponseDTO> getAllProduto();
+    Page<ProdutoResponseDTO> getAllProduto(String nome, Integer categoriaId, Integer marcarId, Pageable pageable);
 
     ProdutoResponseDTO getProdutoById(Integer produtoId);
 
