@@ -11,6 +11,8 @@ import guli.gulix.backend.service.ProdutoService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.apache.coyote.Response;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,8 +28,13 @@ public class ProdutoController {
     private final ProdutoService produtoService;
 
     @GetMapping
-    public ResponseEntity<List<ProdutoResponseDTO>> getAllProduto() {
-        return ResponseEntity.ok(produtoService.getAllProduto());
+    public ResponseEntity<Page<ProdutoResponseDTO>> getAllProduto(
+            @RequestParam(required = false) String nome,
+            @RequestParam(required = false) Integer categoriaId,
+            @RequestParam(required = false) Integer marcaId,
+            Pageable pageable
+    ) {
+        return ResponseEntity.ok(produtoService.getAllProduto(nome, categoriaId, marcaId, pageable));
     }
 
     @GetMapping("/{produtoId}")

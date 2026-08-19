@@ -14,9 +14,15 @@ import guli.gulix.backend.repository.ProdutoRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -62,48 +68,292 @@ public class ProdutoServiceImplTest {
     // getAllProduto()
 
     @Test
-    void deveRetornarListaDeProdutos() {
+    void deveRetornarPaginaDeProdutosQuandoExistiremProdutos() {
         // Arrange
 
-        when(produtoRepository.findAll()).thenReturn(List.of(produto));
+        Pageable pageable = PageRequest.of(0, 10);
+
+        Page<Produto> pageProdutos =
+                new PageImpl<>(
+                        List.of(produto),
+                        pageable,
+                        1);
+
+        when(produtoRepository.findAll(any(Specification.class), eq(pageable))).thenReturn(pageProdutos);
         when(produtoMapper.toDTO(produto)).thenReturn(produtoResponseDTO);
 
 
+
         // Act
-        List<ProdutoResponseDTO> resultado = produtoService.getAllProduto();
+        Page<ProdutoResponseDTO> resultado =
+                produtoService.getAllProduto(
+                        null,
+                        null,
+                        null,
+                        pageable
+                );
 
         // Assert
 
         assertNotNull(resultado);
-        assertEquals(1, resultado.size());
-        assertEquals(produtoResponseDTO, resultado.get(0));
+        assertEquals(1, resultado.getTotalElements());
+        assertEquals(1, resultado.getTotalPages());
+        assertEquals(1, resultado.getContent().size());
+        assertEquals(produtoResponseDTO, resultado.getContent().get(0));
 
 
         // Verifica as interações com as dependências
-        verify(produtoRepository).findAll();
+        verify(produtoRepository).findAll(any(Specification.class), eq(pageable));
         verify(produtoMapper).toDTO(produto);
     }
 
     @Test
-    void deveRetornarListaDeProdutosVaziaQuandoNaoExistiremProdutos() {
+    void deveRetornarPaginaDeProdutosVaziaQuandoNaoExistiremProdutos() {
+
+            // Arrange
+
+            Pageable pageable = PageRequest.of(0, 10);
+
+            Page<Produto> pageVazia =
+                    new PageImpl<>(List.of(),
+                            pageable,
+                            0);
+
+            when(produtoRepository.findAll(any(Specification.class), eq(pageable)))
+                    .thenReturn(pageVazia);
+
+            // Act
+
+            Page<ProdutoResponseDTO> resultado =
+                    produtoService.getAllProduto(
+                            null,
+                            null,
+                            null,
+                            pageable
+                    );
+
+            // Assert
+
+            assertNotNull(resultado);
+            assertTrue(resultado.isEmpty());
+            assertEquals(0, resultado.getTotalElements());
+            assertEquals(0, resultado.getTotalPages());
+            assertEquals(0, resultado.getContent().size());
+
+            verify(produtoRepository)
+                    .findAll(any(Specification.class), eq(pageable));
+
+            verifyNoInteractions(produtoMapper);
+    }
+
+    @Test
+    void deveAplicarFiltroPorNome() {
 
         // Arrange
 
-        when(produtoRepository.findAll()).thenReturn(List.of());
+        String nome = "gabinete";
+
+        Pageable pageable = PageRequest.of(0, 10);
+
+        Page<Produto> pageProdutos =
+                new PageImpl<>(
+                        List.of(produto),
+                        pageable,
+                        1
+                );
+
+        when(produtoRepository.findAll(any(Specification.class), eq(pageable)))
+                .thenReturn(pageProdutos);
+
+        when(produtoMapper.toDTO(produto))
+                .thenReturn(produtoResponseDTO);
 
         // Act
 
-        List<ProdutoResponseDTO> resultado = produtoService.getAllProduto();
+        Page<ProdutoResponseDTO> resultado =
+                produtoService.getAllProduto(
+                        nome,
+                        null,
+                        null,
+                        pageable
+                );
 
         // Assert
 
         assertNotNull(resultado);
-        assertEquals(0, resultado.size());
+        assertEquals(1, resultado.getTotalElements());
+        assertEquals(1, resultado.getTotalPages());
+        assertEquals(produtoResponseDTO, resultado.getContent().get(0));
 
-        verify(produtoRepository).findAll();
-        verifyNoInteractions(produtoMapper);
+        // captura a Specification enviada para o Repository
+        ArgumentCaptor<Specification<Produto>> specificationCaptor =
+                ArgumentCaptor.forClass(Specification.class);
+
+        verify(produtoRepository)
+                .findAll(specificationCaptor.capture(), eq(pageable));
+
+        Specification<Produto> specificationCapturada =
+                specificationCaptor.getValue();
+
+        assertNotNull(specificationCapturada);
+
+        verify(produtoMapper)
+                .toDTO(produto);
+    }
+
+    @Test
+    void deveAplicarFiltroPorCategoria() {
+
+        // Arrange
+
+        Integer categoriaId = 1;
+
+        Pageable pageable = PageRequest.of(0, 10);
+
+        Page<Produto> pageProdutos = new PageImpl<>(
+                List.of(produto),
+                pageable,
+                1
+        );
+
+        when(produtoRepository.findAll(any(Specification.class), eq(pageable))).thenReturn(pageProdutos);
+        when(produtoMapper.toDTO(produto)).thenReturn(produtoResponseDTO);
+
+        // Act
+
+        Page<ProdutoResponseDTO> resultado = produtoService.getAllProduto(
+                null,
+                categoriaId,
+                null,
+                pageable
+        );
+
+        // Assert
+
+        assertNotNull(resultado);
+        assertEquals(1, resultado.getTotalElements());
+        assertEquals(1, resultado.getTotalPages());
+        assertEquals(produtoResponseDTO, resultado.getContent().get(0));
+
+        ArgumentCaptor<Specification<Produto>> specificationArgumentCaptor =
+                ArgumentCaptor.forClass(Specification.class);
+
+
+        verify(produtoRepository).findAll(
+                specificationArgumentCaptor.capture(), eq(pageable)
+        );
+
+        Specification<Produto> specificationCapturada =
+                specificationArgumentCaptor.getValue();
+
+        assertNotNull(specificationCapturada);
+
+        verify(produtoMapper).toDTO(produto);
 
     }
+
+    @Test
+    void deveAplicarFiltroPorMarca() {
+
+        // Arrange
+
+        Integer marcaId = 1;
+
+        Pageable pageable = PageRequest.of(0, 10);
+
+        Page<Produto> pageProdutos = new PageImpl<>(
+                List.of(produto),
+                pageable,
+                1
+        );
+
+        when(produtoRepository.findAll(any(Specification.class), eq(pageable))).thenReturn(pageProdutos);
+        when(produtoMapper.toDTO(produto)).thenReturn(produtoResponseDTO);
+
+        // Act
+
+        Page<ProdutoResponseDTO> resultado = produtoService.getAllProduto(
+                null,
+                null,
+                marcaId,
+                pageable
+        );
+
+        // Assert
+
+        assertNotNull(resultado);
+        assertEquals(1, resultado.getTotalElements());
+        assertEquals(1, resultado.getTotalPages());
+        assertEquals(produtoResponseDTO, resultado.getContent().get(0));
+
+        ArgumentCaptor<Specification<Produto>> specificationArgumentCaptor =
+                ArgumentCaptor.forClass(Specification.class);
+
+
+        verify(produtoRepository).findAll(
+                specificationArgumentCaptor.capture(), eq(pageable)
+        );
+
+        Specification<Produto> specificationCapturada =
+                specificationArgumentCaptor.getValue();
+
+        assertNotNull(specificationCapturada);
+
+        verify(produtoMapper).toDTO(produto);
+
+    }
+
+    @Test
+    void deveAplicarTodosOsFiltros() {
+        // Arrange
+
+        String nome = "gabinete";
+        Integer categoriaId = 1;
+        Integer marcaId = 1;
+
+        Pageable pageable = PageRequest.of(0, 10);
+
+        Page<Produto> pageProdutos = new PageImpl<>(
+                List.of(produto),
+                pageable,
+                1
+        );
+
+        when(produtoRepository.findAll(any(Specification.class), eq(pageable))).thenReturn(pageProdutos);
+        when(produtoMapper.toDTO(produto)).thenReturn(produtoResponseDTO);
+
+        // Act
+
+        Page<ProdutoResponseDTO> resultado = produtoService.getAllProduto(
+                nome,
+                categoriaId,
+                marcaId,
+                pageable
+        );
+
+        // Assert
+
+        assertNotNull(resultado);
+        assertEquals(1, resultado.getTotalElements());
+        assertEquals(1, resultado.getTotalPages());
+        assertEquals(produtoResponseDTO, resultado.getContent().get(0));
+
+        ArgumentCaptor<Specification<Produto>> specificationArgumentCaptor =
+                ArgumentCaptor.forClass(Specification.class);
+
+
+        verify(produtoRepository).findAll(
+                specificationArgumentCaptor.capture(), eq(pageable)
+        );
+
+        Specification<Produto> specificationCapturada =
+                specificationArgumentCaptor.getValue();
+
+        assertNotNull(specificationCapturada);
+
+        verify(produtoMapper).toDTO(produto);
+    }
+
 
     // getProdutoById()
 
@@ -138,12 +388,14 @@ public class ProdutoServiceImplTest {
 
         when(produtoRepository.findById(1)).thenReturn(Optional.empty());
 
-        // Act + Assert
+        // Act
 
         RecursoNaoEncontradoException exception = assertThrows(
                 RecursoNaoEncontradoException.class,
                 ()-> produtoService.getProdutoById(1)
         );
+
+        // Assert
 
         assertEquals("Produto com id 1 não encontrado", exception.getMessage());
 
@@ -191,12 +443,14 @@ public class ProdutoServiceImplTest {
         when(produtoMapper.toEntity(produtoCreateDTO)).thenReturn(produto);
         when(categoriaRepository.findById(produtoCreateDTO.getCategoriaId())).thenReturn(Optional.empty());
 
-        // Act + Assert
+        // Act
 
         RecursoNaoEncontradoException exception = assertThrows(
                 RecursoNaoEncontradoException.class,
                 ()-> produtoService.createNewProduto(produtoCreateDTO)
         );
+
+        // Assert
 
         assertEquals("Categoria com id 1 não encontrado", exception.getMessage());
 
@@ -219,12 +473,14 @@ public class ProdutoServiceImplTest {
         when(marcaRepository.findById(produtoCreateDTO.getMarcaId())).thenReturn(Optional.empty());
 
 
-        // Act + Assert
+        // Act
 
         RecursoNaoEncontradoException exception = assertThrows(
                 RecursoNaoEncontradoException.class,
                 ()-> produtoService.createNewProduto(produtoCreateDTO)
         );
+
+        // Assert
 
         assertEquals("Marca com id 1 não encontrado", exception.getMessage());
 
@@ -262,17 +518,19 @@ public class ProdutoServiceImplTest {
 
         when(produtoRepository.findById(1)).thenReturn(Optional.empty());
 
-        // Act + Assert
+        // Act
 
         RecursoNaoEncontradoException exception = assertThrows(
                 RecursoNaoEncontradoException.class,
                 ()-> produtoService.deleteProdutoById(1)
         );
 
+        // Assert
+
         assertEquals("Produto com id 1 não encontrado", exception.getMessage());
 
         verify(produtoRepository).findById(1);
-        verify(produtoRepository, never()).delete(any());   // verifica se esse metodo delete() nunca é chamado pelo produtoRepository independente do que é passado de argumento de delete().
+        verify(produtoRepository, never()).delete(any(Produto.class));   // verifica se esse metodo delete() nunca é chamado pelo produtoRepository independente do que é passado de argumento de delete().
     }
 
     // updateProdutoById()
@@ -310,12 +568,14 @@ public class ProdutoServiceImplTest {
 
        when(produtoRepository.findById(1)).thenReturn(Optional.empty());
 
-       // Act + Assert
+       // Act
 
         RecursoNaoEncontradoException exception = assertThrows(
                 RecursoNaoEncontradoException.class,
                 ()-> produtoService.updateProdutoById(1, produtoUpdateDTO)
         );
+
+        // Assert
 
         assertEquals("Produto com id 1 não encontrado", exception.getMessage());
 
@@ -334,12 +594,14 @@ public class ProdutoServiceImplTest {
         when(produtoRepository.findById(1)).thenReturn(Optional.of(produto));
         when(categoriaRepository.findById(produtoUpdateDTO.getCategoriaId())).thenReturn(Optional.empty());
 
-        // Act + Assert
+        // Act
 
         RecursoNaoEncontradoException exception = assertThrows(
                 RecursoNaoEncontradoException.class,
                 ()-> produtoService.updateProdutoById(1, produtoUpdateDTO)
         );
+
+        // Assert
 
         assertEquals("Categoria com id 1 não encontrado", exception.getMessage());
 
@@ -361,12 +623,14 @@ public class ProdutoServiceImplTest {
         when(categoriaRepository.findById(produtoUpdateDTO.getCategoriaId())).thenReturn(Optional.of(produto.getCategoria()));
         when(marcaRepository.findById(produtoUpdateDTO.getMarcaId())).thenReturn(Optional.empty());
 
-        // Act + Assert
+        // Act
 
         RecursoNaoEncontradoException exception = assertThrows(
                 RecursoNaoEncontradoException.class,
                 ()-> produtoService.updateProdutoById(1, produtoUpdateDTO)
         );
+
+        // Assert
 
         assertEquals("Marca com id 1 não encontrado", exception.getMessage());
 
@@ -440,12 +704,14 @@ public class ProdutoServiceImplTest {
 
         when(produtoRepository.findById(1)).thenReturn(Optional.empty());
 
-        // Act + Assert
+        // Act
 
         RecursoNaoEncontradoException exception = assertThrows(
                 RecursoNaoEncontradoException.class,
                 ()-> produtoService.updatePartialProdutoById(1, produtoUpdatePartialDTO)
         );
+
+        // Assert
 
         assertEquals("Produto com id 1 não encontrado", exception.getMessage());
 
@@ -463,12 +729,14 @@ public class ProdutoServiceImplTest {
         when(produtoRepository.findById(1)).thenReturn(Optional.of(produto));
         when(categoriaRepository.findById(produtoUpdatePartialDTO.getCategoriaId())).thenReturn(Optional.empty());
 
-        // Act + Assert
+        // Act
 
         RecursoNaoEncontradoException exception = assertThrows(
                 RecursoNaoEncontradoException.class,
                 ()-> produtoService.updatePartialProdutoById(1,produtoUpdatePartialDTO)
         );
+
+        // Assert
 
         assertEquals("Categoria com id 1 não encontrado", exception.getMessage());
 
@@ -489,12 +757,14 @@ public class ProdutoServiceImplTest {
         when(categoriaRepository.findById(produtoUpdatePartialDTO.getCategoriaId())).thenReturn(Optional.of(produto.getCategoria()));
         when(marcaRepository.findById(produtoUpdatePartialDTO.getMarcaId())).thenReturn(Optional.empty());
 
-        // Act + Assert
+        // Act
 
         RecursoNaoEncontradoException exception = assertThrows(
                 RecursoNaoEncontradoException.class,
                 ()-> produtoService.updatePartialProdutoById(1, produtoUpdatePartialDTO)
         );
+
+        // Assert
 
         assertEquals("Marca com id 1 não encontrado", exception.getMessage());
 

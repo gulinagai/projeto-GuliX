@@ -12,6 +12,10 @@ import guli.gulix.backend.service.ProdutoService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -82,32 +86,52 @@ class ProdutoControllerTest {
 
         ProdutoResponseDTO produtoEsperado = ProdutoFixture.produtoResponseDTO();
 
-        List<ProdutoResponseDTO> listaProdutos = List.of(
-                produtoEsperado
+        Pageable pageable = PageRequest.of(0, 10);
+
+        Page<ProdutoResponseDTO> pageProdutos = new PageImpl<>(
+                List.of(produtoEsperado),
+                pageable,
+                1
         );
 
-        when(produtoService.getAllProduto()).thenReturn(listaProdutos);
+        when(produtoService.getAllProduto(
+                isNull(),
+                isNull(),
+                isNull(),
+                any(Pageable.class)
+        )).thenReturn(pageProdutos);
 
         // Act
 
-        mockMvc.perform(get("/api/v1/produtos"))
+        mockMvc.perform(
+                get("/api/v1/produtos")
+                        .param("page", "0")         // forma de passar query param
+                        .param("size", "10")
+                )
 
         // Assert
 
                 .andExpect(status().isOk())   // status 200 OK
-                .andExpect(jsonPath("$[0].id").value(produtoEsperado.getId()))
-                .andExpect(jsonPath("$[0].nome").value(produtoEsperado.getNome()))
-                .andExpect(jsonPath("$[0].resumo").value(produtoEsperado.getResumo()))
-                .andExpect(jsonPath("$[0].preco").value(produtoEsperado.getPreco().doubleValue()))
-                .andExpect(jsonPath("$[0].estoque").value(produtoEsperado.getEstoque()))
-                .andExpect(jsonPath("$[0].imagemURL").value(produtoEsperado.getImagemURL()))
-                .andExpect(jsonPath("$[0].categoriaId").value(produtoEsperado.getCategoriaId()))
-                .andExpect(jsonPath("$[0].marcaId").value(produtoEsperado.getMarcaId()))
-                .andExpect(jsonPath("$[0].destaque").value(produtoEsperado.getDestaque()))
-                .andExpect(jsonPath("$[0].desconto").value(produtoEsperado.getDesconto().doubleValue()));
+                .andExpect(jsonPath("$.content[0].id").value(produtoEsperado.getId()))
+                .andExpect(jsonPath("$.content[0].nome").value(produtoEsperado.getNome()))
+                .andExpect(jsonPath("$.content[0].resumo").value(produtoEsperado.getResumo()))
+                .andExpect(jsonPath("$.content[0].preco").value(produtoEsperado.getPreco().doubleValue()))
+                .andExpect(jsonPath("$.content[0].estoque").value(produtoEsperado.getEstoque()))
+                .andExpect(jsonPath("$.content[0].imagemURL").value(produtoEsperado.getImagemURL()))
+                .andExpect(jsonPath("$.content[0].categoriaId").value(produtoEsperado.getCategoriaId()))
+                .andExpect(jsonPath("$.content[0].marcaId").value(produtoEsperado.getMarcaId()))
+                .andExpect(jsonPath("$.content[0].destaque").value(produtoEsperado.getDestaque()))
+                .andExpect(jsonPath("$.content[0].desconto").value(produtoEsperado.getDesconto().doubleValue()))
+                .andExpect(jsonPath("$.totalElements").value(1))
+                .andExpect(jsonPath("$.totalPages").value(1));
 
 
-        verify(produtoService).getAllProduto();
+        verify(produtoService).getAllProduto(
+                isNull(),
+                isNull(),
+                isNull(),
+                any(Pageable.class)
+        );
     }
 
 
@@ -116,22 +140,246 @@ class ProdutoControllerTest {
 
         // Arrange
 
-        List<ProdutoResponseDTO> listaVazia = List.of();
+        Pageable pageable = PageRequest.of(0, 10);
 
-        when(produtoService.getAllProduto()).thenReturn(listaVazia);
+        Page<ProdutoResponseDTO> pageProdutos = new PageImpl<>(
+                List.of(),
+                pageable,
+                0
+        );
+
+        when(produtoService.getAllProduto(
+                isNull(),
+                isNull(),
+                isNull(),
+                any(Pageable.class)
+        )).thenReturn(pageProdutos);
 
         // Act
 
-        mockMvc.perform(get("/api/v1/produtos"))
+        mockMvc.perform(
+                        get("/api/v1/produtos")
+                                .param("page", "0")
+                                .param("size", "10")
+                )
 
-        // Assert
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$").isEmpty());
+                // Assert
+
+                .andExpect(status().isOk())   // status 200 OK
+                .andExpect(jsonPath("$.content").isEmpty())
+                .andExpect(jsonPath("$.totalElements").value(0))
+                .andExpect(jsonPath("$.totalPages").value(0));
 
 
-        verify(produtoService).getAllProduto();
+        verify(produtoService).getAllProduto(
+                isNull(),
+                isNull(),
+                isNull(),
+                any(Pageable.class)
+        );
     }
 
+    @Test
+    void deveRetornar200AoBuscarTodosOsProdutosFiltrandoPorNome() throws Exception {
+
+        // Arrange
+
+        ProdutoResponseDTO produtoEsperado = ProdutoFixture.produtoResponseDTO();
+
+        String nome = "gabinete";
+
+        Pageable pageable = PageRequest.of(0, 10);
+
+        Page<ProdutoResponseDTO> pageProdutos = new PageImpl<>(
+                List.of(produtoEsperado),
+                pageable,
+                1
+        );
+
+        when(produtoService.getAllProduto(
+                eq(nome),
+                isNull(),
+                isNull(),
+                any(Pageable.class)
+        )).thenReturn(pageProdutos);
+
+        // Act
+
+        mockMvc.perform(
+                        get("/api/v1/produtos")
+                                .param("page", "0")
+                                .param("size", "10")
+                                .param("nome", nome)
+                )
+
+                // Assert
+
+                .andExpect(status().isOk())   // status 200 OK
+                .andExpect(jsonPath("$.content[0].nome").value(produtoEsperado.getNome()))
+                .andExpect(jsonPath("$.totalElements").value(1))
+                .andExpect(jsonPath("$.totalPages").value(1));
+
+
+        verify(produtoService).getAllProduto(
+                eq(nome),
+                isNull(),
+                isNull(),
+                any(Pageable.class)
+        );
+    }
+
+    @Test
+    void deveRetornar200AoBuscarTodosOsProdutosFiltrandoPorCategoriaId() throws Exception {
+
+        // Arrange
+
+        ProdutoResponseDTO produtoEsperado = ProdutoFixture.produtoResponseDTO();
+
+        Integer categoriaId = 1;
+
+        Pageable pageable = PageRequest.of(0, 10);
+
+        Page<ProdutoResponseDTO> pageProdutos = new PageImpl<>(
+                List.of(produtoEsperado),
+                pageable,
+                1
+        );
+
+        when(produtoService.getAllProduto(
+                isNull(),
+                eq(categoriaId),
+                isNull(),
+                any(Pageable.class)
+        )).thenReturn(pageProdutos);
+
+        // Act
+
+        mockMvc.perform(
+                        get("/api/v1/produtos")
+                                .param("page", "0")
+                                .param("size", "10")
+                                .param("categoriaId", categoriaId.toString())
+                )
+
+                // Assert
+
+                .andExpect(status().isOk())   // status 200 OK
+                .andExpect(jsonPath("$.content[0].nome").value(produtoEsperado.getNome()))
+                .andExpect(jsonPath("$.totalElements").value(1))
+                .andExpect(jsonPath("$.totalPages").value(1));
+
+
+        verify(produtoService).getAllProduto(
+                isNull(),
+                eq(categoriaId),
+                isNull(),
+                any(Pageable.class)
+        );
+    }
+
+    @Test
+    void deveRetornar200AoBuscarTodosOsProdutosFiltrandoPorMarcaId() throws Exception {
+
+        // Arrange
+
+        ProdutoResponseDTO produtoEsperado = ProdutoFixture.produtoResponseDTO();
+
+        Integer marcaId = 1;
+
+        Pageable pageable = PageRequest.of(0, 10);
+
+        Page<ProdutoResponseDTO> pageProdutos = new PageImpl<>(
+                List.of(produtoEsperado),
+                pageable,
+                1
+        );
+
+        when(produtoService.getAllProduto(
+                isNull(),
+                isNull(),
+                eq(marcaId),
+                any(Pageable.class)
+        )).thenReturn(pageProdutos);
+
+        // Act
+
+        mockMvc.perform(
+                        get("/api/v1/produtos")
+                                .param("page", "0")
+                                .param("size", "10")
+                                .param("marcaId", marcaId.toString())
+                )
+
+                // Assert
+
+                .andExpect(status().isOk())   // status 200 OK
+                .andExpect(jsonPath("$.content[0].nome").value(produtoEsperado.getNome()))
+                .andExpect(jsonPath("$.totalElements").value(1))
+                .andExpect(jsonPath("$.totalPages").value(1));
+
+
+        verify(produtoService).getAllProduto(
+                isNull(),
+                isNull(),
+                eq(marcaId),
+                any(Pageable.class)
+        );
+    }
+
+    @Test
+    void deveRetornar200AoBuscarTodosOsProdutosComTodosOsFiltros() throws Exception {
+
+        // Arrange
+
+        ProdutoResponseDTO produtoEsperado = ProdutoFixture.produtoResponseDTO();
+
+        String nome = "gabinete";
+        Integer categoriaId = 1;
+        Integer marcaId = 1;
+
+        Pageable pageable = PageRequest.of(0, 10);
+
+        Page<ProdutoResponseDTO> pageProdutos = new PageImpl<>(
+                List.of(produtoEsperado),
+                pageable,
+                1
+        );
+
+        when(produtoService.getAllProduto(
+                eq(nome),
+                eq(categoriaId),
+                eq(marcaId),
+                any(Pageable.class)
+        )).thenReturn(pageProdutos);
+
+        // Act
+
+        mockMvc.perform(
+                        get("/api/v1/produtos")
+                                .param("page", "0")
+                                .param("size", "10")
+                                .param("nome", nome)
+                                .param("categoriaId", categoriaId.toString())
+                                .param("marcaId", marcaId.toString())
+                )
+
+                // Assert
+
+                .andExpect(status().isOk())   // status 200 OK
+                .andExpect(jsonPath("$.content[0].nome").value(produtoEsperado.getNome()))
+                .andExpect(jsonPath("$.content[0].categoriaId").value(produtoEsperado.getCategoriaId()))
+                .andExpect(jsonPath("$.content[0].marcaId").value(produtoEsperado.getMarcaId()))
+                .andExpect(jsonPath("$.totalElements").value(1))
+                .andExpect(jsonPath("$.totalPages").value(1));
+
+
+        verify(produtoService).getAllProduto(
+                eq(nome),
+                eq(categoriaId),
+                eq(marcaId),
+                any(Pageable.class)
+        );
+    }
 
     // getProdutoById(@PathVariable("produtoId") Integer produtoId)
 
