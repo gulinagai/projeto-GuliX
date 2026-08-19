@@ -11,6 +11,7 @@ import guli.gulix.backend.entity.Marca;
 import guli.gulix.backend.mapper.MarcaMapper;
 
 import guli.gulix.backend.service.MarcaService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -41,7 +42,7 @@ public class MarcaController {
 
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<MarcaResponseDTO> createNewMarca(@RequestBody MarcaRequestDTO marcaRequest) {
+    public ResponseEntity<MarcaResponseDTO> createNewMarca(@Valid @RequestBody MarcaRequestDTO marcaRequest) {
 
         MarcaResponseDTO response = marcaService.createNewMarca(marcaRequest);
 
@@ -54,7 +55,7 @@ public class MarcaController {
 
     @PutMapping("/{marcaId}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<MarcaResponseDTO> updateMarcaById(@PathVariable("marcaId") Integer marcaId, @RequestBody MarcaRequestDTO marcaAtualizar) {
+    public ResponseEntity<MarcaResponseDTO> updateMarcaById(@PathVariable("marcaId") Integer marcaId, @Valid @RequestBody MarcaRequestDTO marcaAtualizar) {
 
         MarcaResponseDTO response = marcaService.updateMarcaById(marcaId, marcaAtualizar);
 
