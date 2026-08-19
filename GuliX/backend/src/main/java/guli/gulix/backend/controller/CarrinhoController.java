@@ -5,6 +5,7 @@ import guli.gulix.backend.dto.ItemCarrinhoRequestDTO;
 import guli.gulix.backend.dto.ItemCarrinhoUpdateDTO;
 import guli.gulix.backend.entity.Usuario;
 import guli.gulix.backend.service.CarrinhoService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -34,7 +35,7 @@ public class CarrinhoController {
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<Void> adicionarItem(
             @AuthenticationPrincipal  Usuario usuario,
-            @RequestBody ItemCarrinhoRequestDTO dto
+            @Valid @RequestBody ItemCarrinhoRequestDTO dto
             ) {
         carrinhoService.adicionarItem(usuario.getId(), dto);
         return ResponseEntity.status(HttpStatus.CREATED).build();
@@ -45,7 +46,7 @@ public class CarrinhoController {
     public ResponseEntity<Void> atualizarQuantidade (
             @AuthenticationPrincipal Usuario usuario,
             @PathVariable Integer itemId,
-            @RequestBody ItemCarrinhoUpdateDTO dto
+            @Valid @RequestBody ItemCarrinhoUpdateDTO dto
     ) {
         carrinhoService.atualizarQuantidade(usuario.getId(), itemId, dto);
         return ResponseEntity.ok().build();

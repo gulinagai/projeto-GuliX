@@ -5,6 +5,7 @@ import guli.gulix.backend.dto.EnderecoResponseDTO;
 import guli.gulix.backend.dto.EnderecoUpdateDTO;
 import guli.gulix.backend.entity.Usuario;
 import guli.gulix.backend.service.EnderecoService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -42,7 +43,7 @@ public class EnderecoController {
     @PostMapping
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<EnderecoResponseDTO> createNewEndereco(
-            @RequestBody EnderecoCreateDTO enderecoRequest,
+            @Valid @RequestBody EnderecoCreateDTO enderecoRequest,
             @AuthenticationPrincipal Usuario usuario
     ) {
 
@@ -66,11 +67,11 @@ public class EnderecoController {
         return ResponseEntity.noContent().build();
     }
 
-    @PutMapping("/{enderecoId}")
+    @PatchMapping("/{enderecoId}")
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<EnderecoResponseDTO> updateEnderecoById(
             @PathVariable("enderecoId") Integer enderecoId,
-            @RequestBody EnderecoUpdateDTO enderecoAtualizar,
+            @Valid @RequestBody EnderecoUpdateDTO enderecoAtualizar,
             @AuthenticationPrincipal Usuario usuario
     ) {
 

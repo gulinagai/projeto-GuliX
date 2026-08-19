@@ -26,12 +26,12 @@ public class AuthController {
     private final UsuarioService usuarioService;
 
     @PostMapping("/login")
-    public ResponseEntity<AuthResponseDTO> login(@RequestBody LoginRequestDTO dto) {
+    public ResponseEntity<AuthResponseDTO> login(@Valid @RequestBody LoginRequestDTO dto) {
         return ResponseEntity.ok(authService.login(dto));
     }
 
     @PostMapping("/register")
-    public ResponseEntity<UsuarioResponseDTO> createNewUsuario(@RequestBody @Valid UsuarioCreateDTO usuarioRequest) {
+    public ResponseEntity<UsuarioResponseDTO> createNewUsuario(@Valid @RequestBody UsuarioCreateDTO usuarioRequest) {
 
         UsuarioResponseDTO response = usuarioService.createNewUsuario(usuarioRequest);
 

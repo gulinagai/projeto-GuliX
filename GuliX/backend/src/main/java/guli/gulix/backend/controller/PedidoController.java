@@ -6,6 +6,7 @@ import guli.gulix.backend.dto.PedidoUpdateStatusDTO;
 import guli.gulix.backend.entity.Pedido;
 import guli.gulix.backend.entity.Usuario;
 import guli.gulix.backend.service.PedidoService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -50,7 +51,7 @@ public class PedidoController {
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<PedidoResponseDTO> createNewPedido(
             @AuthenticationPrincipal Usuario usuario,
-            @RequestBody PedidoCreateDTO pedidoCreate
+            @Valid @RequestBody PedidoCreateDTO pedidoCreate
             ) {
 
         PedidoResponseDTO response = pedidoService.createNewPedido(usuario, pedidoCreate);
@@ -87,7 +88,7 @@ public class PedidoController {
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<PedidoResponseDTO> updateStatusPedido(
             @PathVariable("pedidoId") Integer pedidoId,
-            @RequestBody PedidoUpdateStatusDTO dto
+            @Valid @RequestBody PedidoUpdateStatusDTO dto
             ) {
         return ResponseEntity.ok(pedidoService.updateStatusPedido(pedidoId, dto));
     }

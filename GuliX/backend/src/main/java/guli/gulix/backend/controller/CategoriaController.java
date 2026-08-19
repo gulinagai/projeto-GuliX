@@ -6,6 +6,7 @@ import guli.gulix.backend.dto.CategoriaResponseDTO;
 import guli.gulix.backend.entity.Categoria;
 import guli.gulix.backend.mapper.CategoriaMapper;
 import guli.gulix.backend.service.CategoriaService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -36,7 +37,7 @@ public class CategoriaController {
 
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<CategoriaResponseDTO> createNewCategoria(@RequestBody CategoriaRequestDTO categoriaRequest) {
+    public ResponseEntity<CategoriaResponseDTO> createNewCategoria(@Valid @RequestBody CategoriaRequestDTO categoriaRequest) {
 
         CategoriaResponseDTO response = categoriaService.createNewCategoria(categoriaRequest);
 
@@ -50,7 +51,7 @@ public class CategoriaController {
 
     @PutMapping("/{categoriaId}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<CategoriaResponseDTO> updateCategoriaById(@PathVariable("categoriaId") Integer categoriaId, @RequestBody CategoriaRequestDTO categoriaAtualizar) {
+    public ResponseEntity<CategoriaResponseDTO> updateCategoriaById(@PathVariable("categoriaId") Integer categoriaId, @Valid @RequestBody CategoriaRequestDTO categoriaAtualizar) {
 
         CategoriaResponseDTO response = categoriaService.updateCategoriaById(categoriaId, categoriaAtualizar);
 
