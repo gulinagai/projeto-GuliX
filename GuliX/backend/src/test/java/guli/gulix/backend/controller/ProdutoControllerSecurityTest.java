@@ -4,6 +4,8 @@ import guli.gulix.backend.config.SecurityConfig;
 import guli.gulix.backend.dto.ProdutoCreateDTO;
 import guli.gulix.backend.dto.ProdutoUpdateDTO;
 import guli.gulix.backend.fixture.ProdutoFixture;
+import guli.gulix.backend.security.CustomAccessDeniedHandler;
+import guli.gulix.backend.security.CustomAuthenticationEntryPoint;
 import guli.gulix.backend.security.JwtFilter;
 import guli.gulix.backend.service.ProdutoService;
 import org.junit.jupiter.api.Test;
@@ -256,21 +258,40 @@ public class ProdutoControllerSecurityTest {
     @EnableWebSecurity
     @EnableMethodSecurity
     static class TestSecurityConfig {
+        @Bean
+        CustomAuthenticationEntryPoint authenticationEntryPoint(
+                ObjectMapper objectMapper
+        ) {
+            return new CustomAuthenticationEntryPoint(objectMapper);
+        }
 
         @Bean
-        SecurityFilterChain testSecurityFilterChain(HttpSecurity http) throws Exception {
+        CustomAccessDeniedHandler accessDeniedHandler(
+                ObjectMapper objectMapper
+        ) {
+            return new CustomAccessDeniedHandler(objectMapper);
+        }
+
+        @Bean
+        SecurityFilterChain testSecurityFilterChain(
+                HttpSecurity http,
+                CustomAuthenticationEntryPoint authenticationEntryPoint,
+                CustomAccessDeniedHandler accessDeniedHandler
+        ) throws Exception {
+
             return http
                     .csrf(csrf -> csrf.disable())
                     .exceptionHandling(exception -> exception
-                            .authenticationEntryPoint(
-                                    new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)
-                            )
+                            .authenticationEntryPoint(authenticationEntryPoint)
+                            .accessDeniedHandler(accessDeniedHandler)
                     )
                     .authorizeHttpRequests(auth -> auth
                             .anyRequest().authenticated()
                     )
                     .build();
         }
+
+
     }
 
 }
