@@ -6,6 +6,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -152,6 +153,30 @@ public class GlobalExceptionHandler {
                 request.getRequestURI()
         );
 
+
+        return ResponseEntity.status(status).body(erro);
+    }
+
+    /**
+     * Trata situações em que um usuário autenticado não possui permissão
+     * para executar uma operação protegida por Method Security, como @PreAuthorize.
+     * Retorna HTTP 403 (Forbidden).
+     */
+    @ExceptionHandler(AuthorizationDeniedException.class)
+    public ResponseEntity<ErrorResponseDTO> handleAuthorizationDenied(
+            AuthorizationDeniedException ex,
+            HttpServletRequest request
+    ) {
+
+        HttpStatus status = HttpStatus.FORBIDDEN;
+
+        ErrorResponseDTO erro = new ErrorResponseDTO(
+                LocalDateTime.now(),
+                status.value(),
+                "Acesso negado",
+                "Você não possui permissão para executar esta operação",
+                request.getRequestURI()
+        );
 
         return ResponseEntity.status(status).body(erro);
     }
