@@ -1,10 +1,8 @@
 package guli.gulix.backend.controller;
 
-import guli.gulix.backend.dto.AuthResponseDTO;
-import guli.gulix.backend.dto.LoginRequestDTO;
-import guli.gulix.backend.dto.UsuarioCreateDTO;
-import guli.gulix.backend.dto.UsuarioResponseDTO;
+import guli.gulix.backend.dto.*;
 import guli.gulix.backend.service.AuthService;
+import guli.gulix.backend.service.RefreshTokenService;
 import guli.gulix.backend.service.UsuarioService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -42,6 +40,21 @@ public class AuthController {
         return ResponseEntity.status(HttpStatus.CREATED).headers(headers).body(response);
     }
 
+    @PostMapping("/refresh")
+    public ResponseEntity<AuthResponseDTO> refresh(
+            @RequestBody RefreshTokenRequestDTO dto
+            ) {
+        return ResponseEntity.ok(authService.refresh(dto));
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<Void> logout(
+            @RequestBody RefreshTokenRequestDTO dto
+    ) {
+        authService.logout(dto);
+
+        return ResponseEntity.noContent().build();
+    }
 }
 
 
