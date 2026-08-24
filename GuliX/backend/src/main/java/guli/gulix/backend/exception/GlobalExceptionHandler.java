@@ -158,6 +158,29 @@ public class GlobalExceptionHandler {
     }
 
     /**
+     * Trata exceções quando as credenciais são inválidas.
+     * Retorna HTTP 401 (Unauthorized).
+     */
+
+    @ExceptionHandler(CredenciaisInvalidasException.class)
+    public ResponseEntity<ErrorResponseDTO> handleCredenciaisInvalidas (
+            HttpServletRequest request,
+            CredenciaisInvalidasException ex
+    ) {
+        HttpStatus status = HttpStatus.UNAUTHORIZED;
+
+        ErrorResponseDTO erro = new ErrorResponseDTO(
+                LocalDateTime.now(),
+                status.value(),
+                "Credenciais Inválidas",
+                ex.getMessage(),
+                request.getRequestURI()
+        );
+
+        return ResponseEntity.status(status).body(erro);
+    }
+
+    /**
      * Trata situações em que um usuário autenticado não possui permissão
      * para executar uma operação protegida por Method Security, como @PreAuthorize.
      * Retorna HTTP 403 (Forbidden).
