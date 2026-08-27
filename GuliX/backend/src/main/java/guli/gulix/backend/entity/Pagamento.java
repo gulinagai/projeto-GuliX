@@ -1,5 +1,6 @@
 package guli.gulix.backend.entity;
 
+import guli.gulix.backend.entity.enums.GatewayPagamento;
 import guli.gulix.backend.entity.enums.MetodoPagamento;
 import guli.gulix.backend.entity.enums.StatusPagamento;
 import guli.gulix.backend.entity.enums.StatusPedido;
@@ -37,6 +38,16 @@ public class Pagamento {
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
     private StatusPagamento statusPagamento;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name= "gateway", nullable = false)
+    private GatewayPagamento gateway;
+
+    @Column(name = "gateway_checkout_id", unique = true)
+    private String gatewayCheckoutId;
+
+    @Column(name = "gateway_payment_id", unique = true)
+    private String gatewayPaymentId;
 
     @Column(name = "valor_original",
             nullable = false,

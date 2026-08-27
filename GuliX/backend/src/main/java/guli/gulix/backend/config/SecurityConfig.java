@@ -58,6 +58,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/v1/categorias/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/marcas/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/produtos/**").permitAll()
+                        .requestMatchers(HttpMethod.POST,"/webhooks/stripe").permitAll()
 
 
                         // qualquer outro endpoint precisa estar autenticado
