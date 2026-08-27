@@ -16,9 +16,21 @@ public class PagamentoResponseDTO {
 
     private Integer id;
     private Integer pedidoId;
+
     private MetodoPagamento metodoPagamento;
     private StatusPagamento statusPagamento;
-    private BigDecimal valor;
+
+    private BigDecimal valorOriginal;
+    private BigDecimal desconto;
+    private BigDecimal percentualJuros;
+    private BigDecimal valorJuros;
+    private BigDecimal valorFinal;
+
+    private Integer numeroParcelas;
+    private BigDecimal valorParcela;
+
+    private String checkoutUrl;
+
     private LocalDateTime criadoEm;
     private LocalDateTime atualizadoEm;
 

@@ -1,11 +1,9 @@
 package guli.gulix.backend.controller;
 
-import guli.gulix.backend.dto.PagamentoRequestDTO;
 import guli.gulix.backend.dto.PagamentoResponseDTO;
 import guli.gulix.backend.entity.Usuario;
 import guli.gulix.backend.service.PagamentoService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -17,9 +15,6 @@ import org.springframework.web.bind.annotation.*;
 public class PagamentoController {
 
     private final PagamentoService pagamentoService;
-
-    // criar pagamento
-    // fica dentro do PedidoServiceImpl
 
     // buscar pagamento
     @GetMapping("/{pagamentoId}")

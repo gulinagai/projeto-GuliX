@@ -11,6 +11,8 @@ import guli.gulix.backend.entity.enums.StatusPagamento;
 import guli.gulix.backend.entity.enums.StatusPedido;
 import guli.gulix.backend.exception.RecursoNaoEncontradoException;
 import guli.gulix.backend.exception.RegraNegocioException;
+import guli.gulix.backend.gateway.GatewayPagamentoService;
+import guli.gulix.backend.gateway.ResultadoCheckout;
 import guli.gulix.backend.mapper.PagamentoMapper;
 import guli.gulix.backend.repository.PagamentoRepository;
 import lombok.RequiredArgsConstructor;
@@ -25,8 +27,12 @@ import java.math.RoundingMode;
 @Transactional
 public class PagamentoServiceImpl implements PagamentoService {
 
+    private static final BigDecimal PERCENTUAL_JUROS = BigDecimal.valueOf(2);
+
     private final PagamentoRepository pagamentoRepository;
     private final PagamentoMapper pagamentoMapper;
+
+    private final GatewayPagamentoService gatewayPagamentoService;
 
     @Override
     public PagamentoResponseDTO criarPagamento(
@@ -37,17 +43,19 @@ public class PagamentoServiceImpl implements PagamentoService {
         Pagamento pagamento = new Pagamento();
 
         pagamento.setPedido(pedido);
+
         pagamento.setMetodoPagamento(
                 pedidoCreateDTO.getMetodoPagamento()
         );
+
         pagamento.setStatusPagamento(StatusPagamento.PENDENTE);
 
-        // Gateway utilizado para processar o pagamento
         pagamento.setGateway(GatewayPagamento.STRIPE);
 
-        // O valor vem do pedido, nunca do cliente
+        // Valor original do pedido
         pagamento.setValorOriginal(pedido.getTotal());
 
+        // Calcula o desconto de acordo com o metodo de pagamento
         BigDecimal desconto = calculaDesconto(
                 pagamento.getValorOriginal(),
                 pagamento.getMetodoPagamento()
@@ -55,7 +63,7 @@ public class PagamentoServiceImpl implements PagamentoService {
 
         pagamento.setDesconto(desconto);
 
-        // Valor após aplicação do desconto
+        // Valor após o desconto
         BigDecimal valorBase = pagamento.getValorOriginal()
                 .subtract(pagamento.getDesconto());
 
@@ -66,12 +74,23 @@ public class PagamentoServiceImpl implements PagamentoService {
                     pedidoCreateDTO.getNumeroParcelas()
             );
 
+            // Calcula e registra os juros
+            BigDecimal valorJuros = calculaValorJuros(
+                    pagamento.getNumeroParcelas(),
+                    valorBase
+            );
 
-            pagamento.setValorFinal(
-                    calculaValorFinalComJuros(
-                            valorBase,
+            pagamento.setValorJuros(valorJuros);
+
+            pagamento.setPercentualJuros(
+                    calculaPercentualJuros(
                             pagamento.getNumeroParcelas()
                     )
+            );
+
+            // Valor final = valor base + juros
+            pagamento.setValorFinal(
+                    valorBase.add(valorJuros)
             );
 
             pagamento.setValorParcela(
@@ -86,19 +105,83 @@ public class PagamentoServiceImpl implements PagamentoService {
             pagamento.setNumeroParcelas(null);
             pagamento.setValorParcela(null);
 
-            // PIX/Boleto não possuem juros de parcelamento
+            // PIX/Boleto não possuem juros
+            pagamento.setPercentualJuros(BigDecimal.ZERO);
+            pagamento.setValorJuros(BigDecimal.ZERO);
+
             pagamento.setValorFinal(valorBase);
         }
 
         Pagamento saved = pagamentoRepository.save(pagamento);
 
-        return pagamentoMapper.toDTO(saved);
+        ResultadoCheckout resultadoCheckout =
+                gatewayPagamentoService.criarCheckout(saved);
+
+        saved.setGatewayCheckoutId(
+                resultadoCheckout.getGatewayCheckoutId()
+        );
+
+        saved.setGatewayPaymentId(
+                resultadoCheckout.getGatewayPaymentId()
+        );
+
+        PagamentoResponseDTO response =
+                pagamentoMapper.toDTO(saved);
+
+        response.setCheckoutUrl(
+                resultadoCheckout.getCheckoutUrl()
+        );
+
+        return response;
     }
 
-    private BigDecimal calculaValorFinalComJuros(
-            BigDecimal valorBase,
+    private BigDecimal calculaValorJuros(
+            Integer numeroParcelas,
+            BigDecimal valorBase
+    ) {
+
+        validarNumeroParcelas(numeroParcelas);
+
+        // Até 6 parcelas não possuem juros
+        if (numeroParcelas <= 6) {
+            return BigDecimal.ZERO;
+        }
+
+        // De 7 até 48 parcelas possuem 2% de juros
+        if (numeroParcelas <= 48) {
+
+            BigDecimal percentual = PERCENTUAL_JUROS
+                    .divide(BigDecimal.valueOf(100), 4, RoundingMode.HALF_UP);
+
+            return valorBase.multiply(percentual)
+                    .setScale(2, RoundingMode.HALF_UP);
+        }
+
+        throw new RegraNegocioException(
+                "Quantidade de parcelas não permitida."
+        );
+    }
+
+    private BigDecimal calculaPercentualJuros(
             Integer numeroParcelas
     ) {
+
+        validarNumeroParcelas(numeroParcelas);
+
+        if (numeroParcelas <= 6) {
+            return BigDecimal.ZERO;
+        }
+
+        if (numeroParcelas <= 48) {
+            return PERCENTUAL_JUROS;
+        }
+
+        throw new RegraNegocioException(
+                "Quantidade de parcelas não permitida."
+        );
+    }
+
+    private void validarNumeroParcelas(Integer numeroParcelas) {
 
         if (numeroParcelas == null) {
             throw new RegraNegocioException(
@@ -111,25 +194,6 @@ public class PagamentoServiceImpl implements PagamentoService {
                     "Quantidade de parcelas inválida."
             );
         }
-
-        // Até 6 parcelas não possuem juros
-        if (numeroParcelas <= 6) {
-            return valorBase;
-        }
-
-        // De 7 até 48 parcelas aplica 2% de juros
-        if (numeroParcelas <= 48) {
-
-            BigDecimal juros = BigDecimal.valueOf(0.02);
-
-            return valorBase.multiply(
-                    BigDecimal.ONE.add(juros)
-            );
-        }
-
-        throw new RegraNegocioException(
-                "Quantidade de parcelas não permitida."
-        );
     }
 
     private BigDecimal calculaValorParcela(

@@ -60,6 +60,18 @@ public class Pagamento {
             scale = 2)
     private BigDecimal desconto;
 
+    @Column(name = "percentual_juros",
+            nullable = false,
+            precision = 5,
+            scale = 2)
+    private BigDecimal percentualJuros;
+
+    @Column(name = "valor_juros",
+            nullable = false,
+            precision = 10,
+            scale = 2)
+    private BigDecimal valorJuros;
+
     @Column(name = "valor_final",
             nullable = false,
             precision = 10,

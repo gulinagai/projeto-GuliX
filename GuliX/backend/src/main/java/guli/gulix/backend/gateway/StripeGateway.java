@@ -1,12 +1,13 @@
 package guli.gulix.backend.gateway;
 
-
 import com.stripe.StripeClient;
-import com.stripe.exception.StripeException;
 import com.stripe.model.checkout.Session;
 import com.stripe.param.checkout.SessionCreateParams;
+import guli.gulix.backend.entity.Pagamento;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+
+import java.math.RoundingMode;
 
 @Component
 @RequiredArgsConstructor
@@ -14,36 +15,65 @@ public class StripeGateway {
 
     private final StripeClient stripeClient;
 
-    public String criarCheckout() throws StripeException {
+    public ResultadoCheckout criarCheckout(Pagamento pagamento) {
 
-        SessionCreateParams params = SessionCreateParams.builder()
-                .setMode(SessionCreateParams.Mode.PAYMENT)
-                .setSuccessUrl("http://localhost:8080/pagamento/sucesso")
-                .setCancelUrl("http://localhost:8080/pagamento/cancelado")
-                .addLineItem(
-                        SessionCreateParams.LineItem.builder()
-                                .setQuantity(1L)
-                                .setPriceData(
-                                        SessionCreateParams.LineItem.PriceData.builder()
-                                                .setCurrency("brl")
-                                                .setUnitAmount(10000L)
-                                                .setProductData(
-                                                        SessionCreateParams.LineItem.PriceData.ProductData.builder()
-                                                                .setName("Produto de teste")
-                                                                .build()
-                                                )
-                                                .build()
-                                )
-                                .build()
-                )
-                .build();
+        long valorFinalEmCentavos = pagamento.getValorFinal()
+                .movePointRight(2)
+                .setScale(0, RoundingMode.HALF_UP)
+                .longValueExact();
 
-        Session session = stripeClient.v1()
-                .checkout()
-                .sessions()
-                .create(params);
+        SessionCreateParams.LineItem lineItem =
+                SessionCreateParams.LineItem.builder()
+                        .setQuantity(1L)
+                        .setPriceData(
+                                SessionCreateParams.LineItem.PriceData
+                                        .builder()
+                                        .setCurrency("brl")
+                                        .setUnitAmount(valorFinalEmCentavos)
+                                        .setProductData(
+                                                SessionCreateParams
+                                                        .LineItem
+                                                        .PriceData
+                                                        .ProductData
+                                                        .builder()
+                                                        .setName("Pedido GuliX")
+                                                        .build()
+                                        )
+                                        .build()
+                        )
+                        .build();
 
-        return session.getUrl();
+        SessionCreateParams sessionParams =
+                SessionCreateParams.builder()
+                        .setMode(SessionCreateParams.Mode.PAYMENT)
+                        .setSuccessUrl(
+                                "http://localhost:8080/pagamento/sucesso"
+                        )
+                        .setCancelUrl(
+                                "http://localhost:8080/pagamento/cancelado"
+                        )
+                        .addLineItem(lineItem)
+                        .build();
+
+        try {
+
+            Session session = stripeClient.v1()
+                    .checkout()
+                    .sessions()
+                    .create(sessionParams);
+
+            return new ResultadoCheckout(
+                    session.getUrl(),
+                    session.getId(),
+                    session.getPaymentIntent()
+            );
+
+        } catch (Exception e) {
+
+            throw new RuntimeException(
+                    "Erro ao criar Checkout Session no Stripe",
+                    e
+            );
+        }
     }
-
 }
