@@ -1,9 +1,8 @@
-package guli.gulix.backend.controller;
+package guli.gulix.backend.gateway;
 
 import com.stripe.exception.SignatureVerificationException;
 import com.stripe.model.Event;
 import com.stripe.net.Webhook;
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -13,11 +12,14 @@ import org.springframework.web.bind.annotation.*;
 public class StripeWebhookController {
 
     private final String webhookSecret;
+    private final StripeWebhookService stripeWebhookService;
 
     public StripeWebhookController(
-            @Value("${stripe.webhook.secret}") String webhookSecret
+            @Value("${stripe.webhook.secret}") String webhookSecret,
+            StripeWebhookService stripeWebhookService
     ) {
         this.webhookSecret = webhookSecret;
+        this.stripeWebhookService = stripeWebhookService;
     }
 
     @PostMapping
@@ -34,30 +36,13 @@ public class StripeWebhookController {
                     webhookSecret
             );
 
-            switch (event.getType()) {
-                case "checkout.session.completed" -> {
-                    System.out.println("Checkout concluído!");
-                }
-
-                case "payment_intent.succeeded" -> {
-                    System.out.println("Pagamento confirmado!");
-                }
-
-                default -> {
-                    System.out.println("Evento não tratado: " + event.getType());
-                }
-            }
-
-
-
-            System.out.println("Evento Stripe recebido: " + event.getType());
+            stripeWebhookService.processar(event);
 
             return ResponseEntity.ok().build();
 
         } catch (SignatureVerificationException e) {
+
             return ResponseEntity.badRequest().build();
         }
-
     }
-
 }

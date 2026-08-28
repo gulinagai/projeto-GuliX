@@ -11,4 +11,5 @@ public interface PagamentoRepository extends JpaRepository<Pagamento, Integer> {
 
     Optional<Pagamento> findByGatewayPaymentId(String gatewayPaymentId);
 
+    Optional<Object> findByPedidoId(String id);
 }

@@ -52,6 +52,18 @@ public class StripeGateway {
                         .setCancelUrl(
                                 "http://localhost:8080/pagamento/cancelado"
                         )
+                        .putMetadata(
+                                "pagamento_id",
+                                pagamento.getId().toString()
+                        )
+                        .setPaymentIntentData(
+                                SessionCreateParams.PaymentIntentData.builder()
+                                        .putMetadata(
+                                                "pagamento_id",
+                                                pagamento.getId().toString()
+                                        )
+                                        .build()
+                        )
                         .addLineItem(lineItem)
                         .build();
 
