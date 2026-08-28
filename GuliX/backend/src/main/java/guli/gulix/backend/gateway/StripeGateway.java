@@ -4,6 +4,7 @@ import com.stripe.StripeClient;
 import com.stripe.model.checkout.Session;
 import com.stripe.param.checkout.SessionCreateParams;
 import guli.gulix.backend.entity.Pagamento;
+import guli.gulix.backend.entity.enums.MetodoPagamento;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -46,6 +47,12 @@ public class StripeGateway {
         SessionCreateParams sessionParams =
                 SessionCreateParams.builder()
                         .setMode(SessionCreateParams.Mode.PAYMENT)
+                        .addPaymentMethodType(
+                                obterPaymentMethodType(
+                                        pagamento.getMetodoPagamento()
+                                )
+                        )
+
                         .setSuccessUrl(
                                 "http://localhost:8080/pagamento/sucesso"
                         )
@@ -87,5 +94,19 @@ public class StripeGateway {
                     e
             );
         }
+    }
+
+
+    private SessionCreateParams.PaymentMethodType obterPaymentMethodType(MetodoPagamento metodoPagamento) {
+
+        return switch (metodoPagamento) {
+
+            case CARTAO_CREDITO -> SessionCreateParams.PaymentMethodType.CARD;
+
+            case PIX -> SessionCreateParams.PaymentMethodType.PIX;
+
+            case BOLETO -> SessionCreateParams.PaymentMethodType.BOLETO;
+        };
+
     }
 }
