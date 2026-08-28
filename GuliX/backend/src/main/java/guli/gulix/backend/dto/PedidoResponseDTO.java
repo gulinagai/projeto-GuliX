@@ -36,4 +36,6 @@ public class PedidoResponseDTO {
 
     private List<ItemPedidoResponseDTO> itens;
 
+    private PagamentoResponseDTO pagamento;
+
 }

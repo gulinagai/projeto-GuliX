@@ -21,7 +21,6 @@ public class PedidoCreateDTO {
     @NotNull(message = "O método de pagamento é obrigatório")
     private MetodoPagamento metodoPagamento;
 
-    @NotNull(message = "O número de parcelas é obrigatório")
     @Positive(message = "O número de parcelas deve ser maior que zero")
     @Max(48)
     private Integer numeroParcelas;

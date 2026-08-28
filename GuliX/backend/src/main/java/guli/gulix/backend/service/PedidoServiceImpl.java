@@ -77,7 +77,7 @@ public class PedidoServiceImpl implements PedidoService {
 
         // buscar para ver se o endereço passado para entrega existe no banco
 
-        Endereco enderecoExiste = enderecoRepository.findById(pedidoCreateDTO.getEnderecoId())
+        Endereco enderecoExiste = enderecoRepository.findByIdAndUsuario(pedidoCreateDTO.getEnderecoId(), usuario)
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Endereço não encontrado"));
 
         // Mapping Pedido
@@ -113,19 +113,15 @@ public class PedidoServiceImpl implements PedidoService {
         newPedido.setItens(itensPedido);
 
 
-
-        // Mapping Pagamento
-
-        pagamentoService.criarPagamento(newPedido, pedidoCreateDTO);
-
-
-
-
         Pedido saved = pedidoRepository.save(newPedido);
-
         carrinho.getItens().clear();
 
-        return pedidoMapper.toDTO(saved);
+
+        PedidoResponseDTO response = pedidoMapper.toDTO(saved);
+
+        response.setPagamento(pagamentoService.criarPagamento(saved, pedidoCreateDTO));
+
+        return response;
     }
 
     @Override

@@ -1,5 +1,6 @@
 package guli.gulix.backend.entity;
 
+import guli.gulix.backend.entity.enums.GatewayPagamento;
 import guli.gulix.backend.entity.enums.MetodoPagamento;
 import guli.gulix.backend.entity.enums.StatusPagamento;
 import guli.gulix.backend.entity.enums.StatusPedido;
@@ -38,6 +39,16 @@ public class Pagamento {
     @Column(name = "status", nullable = false)
     private StatusPagamento statusPagamento;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name= "gateway", nullable = false)
+    private GatewayPagamento gateway;
+
+    @Column(name = "gateway_checkout_id", unique = true)
+    private String gatewayCheckoutId;
+
+    @Column(name = "gateway_payment_id", unique = true)
+    private String gatewayPaymentId;
+
     @Column(name = "valor_original",
             nullable = false,
             precision = 10,
@@ -48,6 +59,18 @@ public class Pagamento {
             precision = 10,
             scale = 2)
     private BigDecimal desconto;
+
+    @Column(name = "percentual_juros",
+            nullable = false,
+            precision = 5,
+            scale = 2)
+    private BigDecimal percentualJuros;
+
+    @Column(name = "valor_juros",
+            nullable = false,
+            precision = 10,
+            scale = 2)
+    private BigDecimal valorJuros;
 
     @Column(name = "valor_final",
             nullable = false,
