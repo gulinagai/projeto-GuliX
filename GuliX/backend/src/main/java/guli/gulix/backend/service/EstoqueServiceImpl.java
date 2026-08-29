@@ -1,0 +1,130 @@
+package guli.gulix.backend.service;
+
+import guli.gulix.backend.dto.EstoqueRequestDTO;
+import guli.gulix.backend.dto.EstoqueRequestInventarioDTO;
+import guli.gulix.backend.dto.EstoqueResponseDTO;
+import guli.gulix.backend.entity.Estoque;
+import guli.gulix.backend.exception.RecursoNaoEncontradoException;
+import guli.gulix.backend.exception.RegraNegocioException;
+import guli.gulix.backend.mapper.EstoqueMapper;
+import guli.gulix.backend.repository.EstoqueRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+
+@Service
+@RequiredArgsConstructor
+@Transactional
+public class EstoqueServiceImpl implements EstoqueService {
+
+    private final EstoqueRepository estoqueRepository;
+    private final EstoqueMapper estoqueMapper;
+
+    @Override
+    public List<EstoqueResponseDTO> getAllEstoque() {
+        return estoqueRepository.findAll().stream().map(
+                item -> {
+                    EstoqueResponseDTO response = estoqueMapper.toDTO(item);
+                    response.setEstoqueDisponivel(calculaEstoqueDisponivel(item.getEstoqueTotal(), item.getEstoqueReservado()));
+                    return response;
+                }
+        ).toList();
+    }
+
+    @Override
+    public EstoqueResponseDTO getEstoqueByProdutoId(Integer produtoId) {
+
+        Estoque estoque = estoqueRepository.findByProdutoId(produtoId)
+                .orElseThrow(
+                        ()-> new RecursoNaoEncontradoException(
+                                "Estoque do produto de id " + produtoId + " não encontrado"
+                        )
+                );
+
+        EstoqueResponseDTO response = estoqueMapper.toDTO(estoque);
+        response.setEstoqueDisponivel(calculaEstoqueDisponivel(estoque.getEstoqueTotal(), estoque.getEstoqueReservado()));
+
+        return response;
+    }
+
+    @Override
+    public EstoqueResponseDTO adicionarEstoque(Integer produtoId, EstoqueRequestDTO estoqueRequest) {
+
+        Estoque estoque = estoqueRepository.findByProdutoId(produtoId)
+                .orElseThrow(
+                        ()-> new RecursoNaoEncontradoException(
+                                "Estoque do produto de id " + produtoId + " não encontrado"
+                        )
+                );
+
+        estoque.setEstoqueTotal(calculaSomaEstoque(estoque.getEstoqueTotal(), estoqueRequest.quantidade()));
+
+
+        EstoqueResponseDTO response = estoqueMapper.toDTO(estoque);
+        response.setEstoqueDisponivel(calculaEstoqueDisponivel(estoque.getEstoqueTotal(), estoque.getEstoqueReservado()));
+
+        return response;
+    }
+
+
+    @Override
+    public EstoqueResponseDTO removerEstoque(Integer produtoId, EstoqueRequestDTO estoqueRequest) {
+        Estoque estoque = estoqueRepository.findByProdutoId(produtoId)
+                .orElseThrow(
+                        ()-> new RecursoNaoEncontradoException(
+                                "Estoque do produto de id " + produtoId + " não encontrado"
+                        )
+                );
+
+        estoque.setEstoqueTotal(calculaSubtracaoEstoque(estoque.getEstoqueTotal(), estoqueRequest.quantidade(), estoque.getEstoqueReservado()));
+
+        EstoqueResponseDTO response = estoqueMapper.toDTO(estoque);
+        response.setEstoqueDisponivel(calculaEstoqueDisponivel(estoque.getEstoqueTotal(), estoque.getEstoqueReservado()));
+
+        return response;
+    }
+
+
+    @Override
+    public EstoqueResponseDTO realizarInventario(Integer produtoId, EstoqueRequestInventarioDTO estoqueRequest) {
+        Estoque estoque = estoqueRepository.findByProdutoId(produtoId)
+                .orElseThrow(
+                        ()-> new RecursoNaoEncontradoException(
+                                "Estoque do produto de id " + produtoId + " não encontrado"
+                        )
+                );
+
+        if(estoque.getEstoqueReservado() > estoqueRequest.quantidade()) throw new RegraNegocioException("A quantidade informada no inventário é menor do que a quantidade em reserva");
+
+        estoque.setEstoqueTotal(estoqueRequest.quantidade());
+
+        EstoqueResponseDTO response = estoqueMapper.toDTO(estoque);
+        response.setEstoqueDisponivel(calculaEstoqueDisponivel(estoque.getEstoqueTotal(), estoque.getEstoqueReservado()));
+
+        return response;
+    }
+
+    private Integer calculaSomaEstoque(Integer estoqueTotal, Integer estoqueASomar) {
+        return estoqueTotal + estoqueASomar;
+    }
+
+    private Integer calculaSubtracaoEstoque(Integer estoqueTotal, Integer estoqueASubtrair, Integer estoqueReservado) {
+
+        if(estoqueASubtrair <= estoqueTotal) {
+            if((estoqueTotal - estoqueASubtrair) >= estoqueReservado)
+                return estoqueTotal - estoqueASubtrair;
+            else {
+                throw new RegraNegocioException("A quantidade total após a subtração é menor do que a quantidade reservada");
+            }
+        }
+        else {
+            throw new RegraNegocioException("A quantidade solicitada para subtração é maior do que a quantidade em estoque");
+        }
+    }
+
+    private Integer calculaEstoqueDisponivel(Integer estoqueTotal, Integer estoqueReservado) {
+        return estoqueTotal - estoqueReservado;
+    }
+}
