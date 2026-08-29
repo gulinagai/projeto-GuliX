@@ -16,4 +16,6 @@ public interface EstoqueService {
     EstoqueResponseDTO removerEstoque(Integer produtoId, EstoqueRequestDTO estoqueRequest);
 
     EstoqueResponseDTO realizarInventario(Integer produtoId, EstoqueRequestInventarioDTO estoqueRequest);
+
+    Integer getQuantidadeDisponivel(Integer produtoId);
 }

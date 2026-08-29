@@ -106,6 +106,19 @@ public class EstoqueServiceImpl implements EstoqueService {
         return response;
     }
 
+    @Override
+    public Integer getQuantidadeDisponivel(Integer produtoId) {
+        Estoque estoque = estoqueRepository.findByProdutoId(produtoId)
+                .orElseThrow(
+                        ()-> new RecursoNaoEncontradoException(
+                                "Estoque do produto de id " + produtoId + " não encontrado"
+                        )
+                );
+
+        return calculaEstoqueDisponivel(estoque.getEstoqueTotal(), estoque.getEstoqueReservado());
+    }
+
+
     private Integer calculaSomaEstoque(Integer estoqueTotal, Integer estoqueASomar) {
         return estoqueTotal + estoqueASomar;
     }

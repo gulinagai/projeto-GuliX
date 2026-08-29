@@ -3,18 +3,11 @@ package guli.gulix.backend.service;
 import guli.gulix.backend.dto.CarrinhoResponseDTO;
 import guli.gulix.backend.dto.ItemCarrinhoRequestDTO;
 import guli.gulix.backend.dto.ItemCarrinhoUpdateDTO;
-import guli.gulix.backend.entity.Carrinho;
-import guli.gulix.backend.entity.ItemCarrinho;
-import guli.gulix.backend.entity.Produto;
-import guli.gulix.backend.entity.Usuario;
-import guli.gulix.backend.entity.enums.StatusCarrinho;
+import guli.gulix.backend.entity.*;
 import guli.gulix.backend.exception.RecursoNaoEncontradoException;
 import guli.gulix.backend.exception.RegraNegocioException;
 import guli.gulix.backend.mapper.CarrinhoMapper;
-import guli.gulix.backend.repository.CarrinhoRepository;
-import guli.gulix.backend.repository.ItemCarrinhoRepository;
-import guli.gulix.backend.repository.ProdutoRepository;
-import guli.gulix.backend.repository.UsuarioRepository;
+import guli.gulix.backend.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,6 +24,7 @@ public class CarrinhoServiceImpl implements CarrinhoService {
     private final UsuarioRepository usuarioRepository;
     private final ProdutoRepository produtoRepository;
     private final ItemCarrinhoRepository itemCarrinhoRepository;
+    private final EstoqueService estoqueService;
 
     @Transactional
     public CarrinhoResponseDTO buscarCarrinho(Integer usuarioId) {
@@ -65,14 +59,14 @@ public class CarrinhoServiceImpl implements CarrinhoService {
         if(item != null) {
             Integer novaQuantidade = item.getQuantidade() + itemDTO.getQuantidade();
 
-            validarEstoque(novaQuantidade, produto.getEstoque());
+            validarEstoque(novaQuantidade, produto.getId());
             item.setQuantidade(novaQuantidade);
 
         } else {
             ItemCarrinho novo = new ItemCarrinho();
             novo.setCarrinho(carrinho);
             novo.setProduto(produto);
-            validarEstoque(itemDTO.getQuantidade(), produto.getEstoque());
+            validarEstoque(itemDTO.getQuantidade(), produto.getId());
             novo.setQuantidade(itemDTO.getQuantidade());
 
 
@@ -99,6 +93,8 @@ public class CarrinhoServiceImpl implements CarrinhoService {
          if(dto.getQuantidade() <= 0) {
              throw new RegraNegocioException("Quantidade deve ser maior que zero");
          }
+
+         validarEstoque(dto.getQuantidade(), item.getProduto().getId());
 
          item.setQuantidade(dto.getQuantidade());
 
@@ -146,10 +142,11 @@ public class CarrinhoServiceImpl implements CarrinhoService {
         return carrinhoRepository.save(carrinho);
     }
 
-    private void validarEstoque(Integer quantidadeItem, Long quantidadeEstoque) {
+    private void validarEstoque(Integer quantidadeItem, Integer produtoId) {
+
         // conversão para tipo primitivo para não gerar inconsistência por comparação entre tipos Wrapper. Comparação entre tipos primitivos é segura.
         int quantItem = quantidadeItem;
-        long quantEst = quantidadeEstoque;
+        long quantEst = estoqueService.getQuantidadeDisponivel(produtoId);
 
 
         if(!(quantEst > 0)) {
