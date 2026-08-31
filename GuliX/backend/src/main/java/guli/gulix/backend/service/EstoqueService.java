@@ -18,4 +18,6 @@ public interface EstoqueService {
     EstoqueResponseDTO realizarInventario(Integer produtoId, EstoqueRequestInventarioDTO estoqueRequest);
 
     Integer getQuantidadeDisponivel(Integer produtoId);
+
+    void setQuantidadeReservada(Integer produtoId, Integer quantidadeAReservar, String operacao);
 }

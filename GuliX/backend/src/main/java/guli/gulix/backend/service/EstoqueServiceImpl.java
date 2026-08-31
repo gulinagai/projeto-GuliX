@@ -118,6 +118,21 @@ public class EstoqueServiceImpl implements EstoqueService {
         return calculaEstoqueDisponivel(estoque.getEstoqueTotal(), estoque.getEstoqueReservado());
     }
 
+    public void setQuantidadeReservada(Integer produtoId, Integer quantidadeAReservar, String operacao) {
+        Estoque estoque = estoqueRepository.findByProdutoId(produtoId)
+                .orElseThrow(
+                        ()-> new RecursoNaoEncontradoException(
+                                "Estoque do produto de id " + produtoId + " não encontrado"
+                        )
+                );
+
+        if("soma".equals(operacao)) {
+            reservaProduto(estoque, quantidadeAReservar);
+        } else if("subtracao".equals(operacao)) {
+            removeReservaProduto(estoque, quantidadeAReservar);
+        }
+
+    }
 
     private Integer calculaSomaEstoque(Integer estoqueTotal, Integer estoqueASomar) {
         return estoqueTotal + estoqueASomar;
@@ -139,5 +154,15 @@ public class EstoqueServiceImpl implements EstoqueService {
 
     private Integer calculaEstoqueDisponivel(Integer estoqueTotal, Integer estoqueReservado) {
         return estoqueTotal - estoqueReservado;
+    }
+
+    private void reservaProduto(Estoque estoque, Integer quantidadeAReservar) {
+        estoque.setEstoqueReservado(estoque.getEstoqueReservado() + quantidadeAReservar);
+    }
+
+    private void removeReservaProduto(Estoque estoque, Integer quantidadeAReservar) {
+        if (estoque.getEstoqueReservado() - quantidadeAReservar >= 0) {
+            estoque.setEstoqueReservado(estoque.getEstoqueReservado() - quantidadeAReservar);
+        }
     }
 }

@@ -3,12 +3,14 @@ package guli.gulix.backend.gateway;
 import com.stripe.model.Event;
 import com.stripe.model.PaymentIntent;
 import com.stripe.model.checkout.Session;
+import guli.gulix.backend.entity.ItemPedido;
 import guli.gulix.backend.entity.Pagamento;
 import guli.gulix.backend.entity.Pedido;
 import guli.gulix.backend.entity.enums.StatusPagamento;
 import guli.gulix.backend.entity.enums.StatusPedido;
 import guli.gulix.backend.exception.RecursoNaoEncontradoException;
 import guli.gulix.backend.repository.PagamentoRepository;
+import guli.gulix.backend.service.EstoqueService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,6 +23,7 @@ import lombok.extern.slf4j.Slf4j;
 public class StripeWebhookServiceImpl implements StripeWebhookService {
 
     private final PagamentoRepository pagamentoRepository;
+    private final EstoqueService estoqueService;
 
     @Override
     public void processar(Event event) {
@@ -124,6 +127,11 @@ public class StripeWebhookServiceImpl implements StripeWebhookService {
         pedido.setStatusPedido(
                 StatusPedido.APROVADO
         );
+
+        for(ItemPedido itemPedido : pedido.getItens()) {
+            estoqueService.setQuantidadeReservada(itemPedido.getProduto().getId(), itemPedido.getQuantidade(), "subtracao");
+        }
+
     }
 
     private void processarPaymentIntentFailed(Event event) {
