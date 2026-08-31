@@ -4,6 +4,7 @@ import guli.gulix.backend.dto.EstoqueRequestDTO;
 import guli.gulix.backend.dto.EstoqueRequestInventarioDTO;
 import guli.gulix.backend.dto.EstoqueResponseDTO;
 import guli.gulix.backend.entity.Estoque;
+import guli.gulix.backend.entity.Produto;
 import guli.gulix.backend.exception.RecursoNaoEncontradoException;
 import guli.gulix.backend.exception.RegraNegocioException;
 import guli.gulix.backend.mapper.EstoqueMapper;
@@ -47,6 +48,17 @@ public class EstoqueServiceImpl implements EstoqueService {
         response.setEstoqueDisponivel(calculaEstoqueDisponivel(estoque.getEstoqueTotal(), estoque.getEstoqueReservado()));
 
         return response;
+    }
+
+    @Override
+    public void createNewEstoque(Produto produto) {
+        Estoque estoque = new Estoque();
+
+        estoque.setProduto(produto);
+        estoque.setEstoqueReservado(0);
+        estoque.setEstoqueTotal(0);
+
+        estoqueRepository.save(estoque);
     }
 
     @Override

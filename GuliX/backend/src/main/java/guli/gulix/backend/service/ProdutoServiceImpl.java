@@ -1,15 +1,15 @@
 package guli.gulix.backend.service;
 
-import guli.gulix.backend.dto.ProdutoCreateDTO;
-import guli.gulix.backend.dto.ProdutoPatchDTO;
-import guli.gulix.backend.dto.ProdutoResponseDTO;
-import guli.gulix.backend.dto.ProdutoUpdateDTO;
+import guli.gulix.backend.dto.*;
 import guli.gulix.backend.entity.Categoria;
+import guli.gulix.backend.entity.Estoque;
 import guli.gulix.backend.entity.Marca;
 import guli.gulix.backend.entity.Produto;
 import guli.gulix.backend.exception.RecursoNaoEncontradoException;
+import guli.gulix.backend.mapper.EstoqueMapper;
 import guli.gulix.backend.mapper.ProdutoMapper;
 import guli.gulix.backend.repository.CategoriaRepository;
+import guli.gulix.backend.repository.EstoqueRepository;
 import guli.gulix.backend.repository.MarcaRepository;
 import guli.gulix.backend.repository.ProdutoRepository;
 import guli.gulix.backend.specification.ProdutoSpecification;
@@ -29,6 +29,8 @@ public class ProdutoServiceImpl implements ProdutoService {
     private final CategoriaRepository categoriaRepository;
     private final MarcaRepository marcaRepository;
     private final ProdutoMapper produtoMapper;
+    private final EstoqueService estoqueService;
+    private final EstoqueRepository estoqueRepository;
 
     @Override
     @Transactional(readOnly = true)
@@ -56,7 +58,16 @@ public class ProdutoServiceImpl implements ProdutoService {
 
         Page<Produto> produtos = produtoRepository.findAll(specification, pageable);
 
-        return produtos.map(produtoMapper::toDTO);
+        return produtos.map(produto -> {
+                    ProdutoResponseDTO response = produtoMapper.toDTO(produto);
+                    EstoqueResponseDTO estoque = estoqueService.getEstoqueByProdutoId(produto.getId());
+
+                    response.setEstoque(estoque);
+
+                    return response;
+            }
+
+        );
 
     }
 
@@ -69,7 +80,12 @@ public class ProdutoServiceImpl implements ProdutoService {
                          "Produto com id " + produtoId + " não encontrado"
                         ));
 
-        return produtoMapper.toDTO(produto);
+        ProdutoResponseDTO response = produtoMapper.toDTO(produto);
+        EstoqueResponseDTO estoque = estoqueService.getEstoqueByProdutoId(produto.getId());
+
+        response.setEstoque(estoque);
+
+        return response;
     }
 
     @Override
@@ -95,16 +111,34 @@ public class ProdutoServiceImpl implements ProdutoService {
             produto.setMarca(marca);
         }
 
-        return produtoMapper.toDTO(produtoRepository.save(produto));
+        estoqueService.createNewEstoque(produto);
+
+        ProdutoResponseDTO response = produtoMapper.toDTO(produtoRepository.save(produto));
+
+        EstoqueResponseDTO estoque = estoqueService.getEstoqueByProdutoId(produto.getId());
+
+        response.setEstoque(estoque);
+
+        return response;
     }
 
     @Override
     public void deleteProdutoById(Integer produtoId) {
+
+        Estoque estoque = estoqueRepository.findByProdutoId(produtoId)
+                .orElseThrow(()->
+                        new RecursoNaoEncontradoException(
+                                "Estoque com produto id " + produtoId + " não encontrado"
+                        ));
+
+
         Produto produto = produtoRepository.findById(produtoId)
                 .orElseThrow(()->
                         new RecursoNaoEncontradoException(
                                 "Produto com id " + produtoId + " não encontrado"
                         ));
+
+        estoqueRepository.delete(estoque);
         produtoRepository.delete(produto);
     }
 
@@ -120,16 +154,6 @@ public class ProdutoServiceImpl implements ProdutoService {
         produtoMapper.updateEntityFromDto(produtoAtualizar, produto); // o Mapstruct gera todos os sets automaticamente! atualiza o que tiver para atualizar no objeto
         // basta gravar no banco
         // o fato de existir metodo no mapper tratando update, representa exatamente o que seria feito abaixo manualmente:
-
-//        produto.setNome(produtoAtualizar.getNome());
-//        produto.setResumo(produtoAtualizar.getResumo());
-//        produto.setPreco(produtoAtualizar.getPreco());
-//        produto.setEstoque(produtoAtualizar.getEstoque());
-//        produto.setCategoriaId(produtoAtualizar.getCategoriaId());
-//        produto.setImagemURL(produtoAtualizar.getImagemURL());
-//        produto.setMarcaId(produtoAtualizar.getMarcaId());
-//        produto.setDestaque(produtoAtualizar.getDestaque());
-//        produto.setDesconto(produtoAtualizar.getDesconto());
 
         if(produtoAtualizar.getCategoriaId() != null) {
             Categoria categoria = categoriaRepository.findById(produtoAtualizar.getCategoriaId())
@@ -165,34 +189,6 @@ public class ProdutoServiceImpl implements ProdutoService {
         produtoMapper.patchEntityFromDto(produtoAtualizar, produto); // o Mapstruct gera todos os sets automaticamente! atualiza o que tiver para atualizar no objeto
         // basta gravar no banco
         // o fato de no mapper existir tratamento para ignorar null, é exatamente o que seria feito abaixo manualmente:
-
-//        if(produtoParcial.getNome() != null) {
-//            produto.setNome(produtoParcial.getNome());
-//        }
-//
-//        if(produtoParcial.getResumo() != null) {
-//            produto.setResumo(produtoParcial.getResumo());
-//        }
-//
-//        if(produtoParcial.getPreco() != null) {
-//            produto.setPreco(produtoParcial.getPreco());
-//        }
-//
-//        if(produtoParcial.getEstoque() != null) {
-//            produto.setEstoque(produtoParcial.getEstoque());
-//        }
-//
-//        if(produtoParcial.getImagemURL() != null) {
-//            produto.setImagemURL(produtoParcial.getImagemURL());
-//        }
-//
-//        if(produtoParcial.getDestaque() != null) {
-//            produto.setDestaque(produtoParcial.getDestaque());
-//        }
-//
-//        if(produtoParcial.getDesconto() != null) {
-//            produto.setDesconto(produtoParcial.getDesconto());
-//        }
 
         if(produtoAtualizar.getCategoriaId() != null) {
             Categoria categoria = categoriaRepository.findById(produtoAtualizar.getCategoriaId())

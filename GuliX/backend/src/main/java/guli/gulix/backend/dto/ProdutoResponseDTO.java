@@ -22,7 +22,7 @@ public class ProdutoResponseDTO {
     private String nome;
     private String resumo;
     private BigDecimal preco;
-    private Long estoque;
+    private EstoqueResponseDTO estoque;
     private Boolean destaque;
     private String imagemURL;
     private BigDecimal desconto;
