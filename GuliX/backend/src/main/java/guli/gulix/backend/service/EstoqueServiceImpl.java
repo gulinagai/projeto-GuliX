@@ -146,6 +146,22 @@ public class EstoqueServiceImpl implements EstoqueService {
 
     }
 
+    @Override
+    public void setQuantidadeTotal(Integer produtoId, Integer quantidadeBaixada, String operacao) {
+        Estoque estoque = estoqueRepository.findByProdutoId(produtoId)
+                .orElseThrow(
+                        ()-> new RecursoNaoEncontradoException(
+                                "Estoque do produto de id " + produtoId + " não encontrado"
+                        )
+                );
+
+        if("subtracao".equals(operacao)) {
+            baixaEstoque(estoque, quantidadeBaixada);
+        }
+
+    }
+
+
     private Integer calculaSomaEstoque(Integer estoqueTotal, Integer estoqueASomar) {
         return estoqueTotal + estoqueASomar;
     }
@@ -177,4 +193,13 @@ public class EstoqueServiceImpl implements EstoqueService {
             estoque.setEstoqueReservado(estoque.getEstoqueReservado() - quantidadeAReservar);
         }
     }
+
+    private void baixaEstoque(Estoque estoque, Integer quantidadeBaixada) {
+        if(estoque.getEstoqueTotal() - quantidadeBaixada < 0) {
+            throw new RegraNegocioException("A quantidade após a baixa é menor que zero");
+        }
+
+        estoque.setEstoqueTotal(estoque.getEstoqueTotal() - quantidadeBaixada);
+    }
+
 }

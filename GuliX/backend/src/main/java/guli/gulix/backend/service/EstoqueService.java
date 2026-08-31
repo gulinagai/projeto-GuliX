@@ -24,4 +24,5 @@ public interface EstoqueService {
 
     void setQuantidadeReservada(Integer produtoId, Integer quantidadeAReservar, String operacao);
 
+    void setQuantidadeTotal(Integer produtoId, Integer quantidadeBaixada, String operacao);
 }

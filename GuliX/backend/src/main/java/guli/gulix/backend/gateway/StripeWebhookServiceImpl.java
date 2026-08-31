@@ -130,6 +130,7 @@ public class StripeWebhookServiceImpl implements StripeWebhookService {
 
         for(ItemPedido itemPedido : pedido.getItens()) {
             estoqueService.setQuantidadeReservada(itemPedido.getProduto().getId(), itemPedido.getQuantidade(), "subtracao");
+            estoqueService.setQuantidadeTotal(itemPedido.getProduto().getId(), itemPedido.getQuantidade(), "subtracao");
         }
 
     }
