@@ -8,7 +8,6 @@ import guli.gulix.backend.entity.Endereco;
 import org.mapstruct.*;
 
 @Mapper(componentModel = "spring")
-
 public interface EnderecoMapper {
 
     // para CREATE:

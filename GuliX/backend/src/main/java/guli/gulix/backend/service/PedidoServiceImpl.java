@@ -12,6 +12,7 @@ import guli.gulix.backend.exception.RegraNegocioException;
 import guli.gulix.backend.mapper.PedidoMapper;
 import guli.gulix.backend.repository.CarrinhoRepository;
 import guli.gulix.backend.repository.EnderecoRepository;
+import guli.gulix.backend.repository.EstoqueRepository;
 import guli.gulix.backend.repository.PedidoRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -30,6 +31,8 @@ public class PedidoServiceImpl implements PedidoService {
     private final EnderecoRepository enderecoRepository;
     private final CarrinhoService carrinhoService;
     private final PagamentoService pagamentoService;
+    private final EstoqueService estoqueService;
+
 
     // USER
 
@@ -68,12 +71,30 @@ public class PedidoServiceImpl implements PedidoService {
     @Override
     public PedidoResponseDTO createNewPedido(Usuario usuario, PedidoCreateDTO pedidoCreateDTO) {
 
-        Pedido newPedido = new Pedido();
-
         // buscar carrinho
 
         Carrinho carrinho = carrinhoRepository.findByUsuarioId(usuario.getId())
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Carrinho não encontrado"));
+
+
+        for(ItemCarrinho itemCarrinho : carrinho.getItens()) {
+
+            Integer produtoId = itemCarrinho.getProduto().getId();
+            Integer quantidade = itemCarrinho.getQuantidade();
+
+            Integer estoqueDisponivel = estoqueService.getQuantidadeDisponivel(produtoId);
+
+            if(!(estoqueDisponivel > 0)) {
+                throw new RegraNegocioException("Estoque indisponível para este produto");
+            }
+
+            if(quantidade > estoqueDisponivel) {
+                throw new RegraNegocioException("Quantidade solicitada maior que a quantidade disponível em estoque");
+            }
+        }
+
+
+        Pedido newPedido = new Pedido();
 
         // buscar para ver se o endereço passado para entrega existe no banco
 
@@ -106,6 +127,10 @@ public class PedidoServiceImpl implements PedidoService {
                     itemPedido.setPrecoUnitario(itemCarrinho.getProduto().getPreco());
                     itemPedido.setPedido(newPedido);
 
+
+                    estoqueService.setQuantidadeReservada(itemPedido.getProduto().getId(), itemPedido.getQuantidade(), "soma");
+
+
                     return itemPedido;
                 }
         ).toList();
@@ -124,6 +149,7 @@ public class PedidoServiceImpl implements PedidoService {
         return response;
     }
 
+
     @Override
     public PedidoResponseDTO cancelPedido(Integer pedidoId, Usuario usuario) {
 
@@ -135,6 +161,16 @@ public class PedidoServiceImpl implements PedidoService {
 
         if (StatusPedido.CANCELADO.equals(pedido.getStatusPedido())) {
             throw new RegraNegocioException("Pedido já está cancelado");
+        }
+
+        if (!StatusPedido.PENDENTE.equals(pedido.getStatusPedido())) {
+            throw new RegraNegocioException(
+                    "Somente pedidos pendentes podem ser cancelados."
+            );
+        }
+
+        for(ItemPedido itemPedido : pedido.getItens()) {
+            estoqueService.setQuantidadeReservada(itemPedido.getProduto().getId(), itemPedido.getQuantidade(), "subtracao");
         }
 
         pedido.setStatusPedido(StatusPedido.CANCELADO);
@@ -151,6 +187,7 @@ public class PedidoServiceImpl implements PedidoService {
     public List<PedidoResponseDTO> getAllPedidos() {
         return pedidoRepository.findAll().stream().map(pedidoMapper::toDTO).toList();
     }
+
 
     @Override
     public PedidoResponseDTO updateStatusPedido(Integer pedidoId, PedidoUpdateStatusDTO dto) {
@@ -174,5 +211,8 @@ public class PedidoServiceImpl implements PedidoService {
             throw new RegraNegocioException("Acesso negado");
         }
     }
+
+
+
 
 }

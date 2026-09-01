@@ -33,10 +33,6 @@ public class ProdutoCreateDTO {
     @DecimalMin(value = "0.0", inclusive = false, message = "O preço deve ser maior que zero")
     private BigDecimal preco;
 
-    @NotNull(message = "O estoque é obrigatório")
-    @Min(value = 0, message = "O estoque não pode ser negativo")
-    private Long estoque;
-
     @NotNull(message = "A categoria é obrigatória")
     private Integer categoriaId;
 

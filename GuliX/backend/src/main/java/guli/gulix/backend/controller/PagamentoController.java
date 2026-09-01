@@ -26,15 +26,4 @@ public class PagamentoController {
         return ResponseEntity.ok(pagamentoService.getPagamentoById(pagamentoId, usuario));
     }
 
-    // confirmar pagamento
-    @PatchMapping("/{pagamentoId}/confirmar")
-    @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<PagamentoResponseDTO> confirmarPagamento(
-            @PathVariable Integer pagamentoId,
-            @AuthenticationPrincipal Usuario usuario
-    ) {
-        return ResponseEntity.ok(
-                pagamentoService.confirmarPagamento(pagamentoId, usuario)
-        );
-    }
 }

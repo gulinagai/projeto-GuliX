@@ -23,10 +23,6 @@ public class ProdutoPatchDTO {
     @DecimalMin(value = "0.0", inclusive = false, message = "O preço deve ser maior que zero")
     private BigDecimal preco;
 
-    @Min(value = 0, message = "O estoque não pode ser negativo")
-    private Long estoque;
-
-
     private Integer categoriaId;
 
     @Pattern(

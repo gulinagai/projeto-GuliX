@@ -28,9 +28,6 @@ public class Produto {
     @Column(precision = 10, scale = 2, nullable = false)
     private BigDecimal preco;
 
-    @Column(nullable = false)
-    private Long estoque;
-
     @Column(name = "imagem_url", nullable = false)
     private String imagemURL;
 
