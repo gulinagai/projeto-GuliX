@@ -52,7 +52,17 @@ public class EnderecoServiceImpl implements EnderecoService{
 
          validaPrimeiroEndereco(usuarioLogado.getId(), endereco);
 
+         // gera coordenadas
+
+        montaCoordenadas();
+
         return enderecoMapper.toDTO(enderecoRepository.save(endereco));
+
+    }
+
+    private void montaCoordenadas() {
+
+
 
     }
 

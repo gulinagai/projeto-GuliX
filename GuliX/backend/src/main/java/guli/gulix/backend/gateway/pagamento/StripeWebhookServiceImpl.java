@@ -1,4 +1,4 @@
-package guli.gulix.backend.gateway;
+package guli.gulix.backend.gateway.pagamento;
 
 import com.stripe.model.Event;
 import com.stripe.model.PaymentIntent;

@@ -1,4 +1,4 @@
-package guli.gulix.backend.gateway;
+package guli.gulix.backend.gateway.pagamento;
 
 import guli.gulix.backend.entity.Pagamento;
 import lombok.RequiredArgsConstructor;
