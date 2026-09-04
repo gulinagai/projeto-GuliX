@@ -1,13 +1,12 @@
 package guli.gulix.backend.gateway.openrouteservice;
 
-import guli.gulix.backend.gateway.openrouteservice.dto.SnapRequestDTO;
-import guli.gulix.backend.gateway.openrouteservice.dto.SnapResponseDTO;
+import guli.gulix.backend.gateway.openrouteservice.dto.*;
 import guli.gulix.backend.geographic.Coordenada;
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Component
@@ -51,4 +50,42 @@ public class OpenRouteServiceGatewayImpl implements OpenRouteServiceGateway {
                 location.get(0)
         );
     }
+
+    @Override
+    public Rota calcularRota(
+            Coordenada origem,
+            Coordenada destino
+    ) {
+
+        DirectionsRequestDTO request = new DirectionsRequestDTO(
+                List.of(
+                        List.of(
+                                origem.longitude(),
+                                origem.latitude()
+                        ),
+                        List.of(
+                                destino.longitude(),
+                                destino.latitude()
+                        )
+                )
+        );
+
+        DirectionsResponseDTO response = restClient.post()
+                .uri("/ors/v2/directions/driving-car/json")
+                .header("Authorization", apiKey)
+                .body(request)
+                .retrieve()
+                .body(DirectionsResponseDTO.class);
+
+        DirectionsResponseDTO.SummaryDTO summary =
+                response.routes()
+                        .getFirst()
+                        .summary();
+
+        return new Rota(
+                BigDecimal.valueOf(summary.distance()),
+                BigDecimal.valueOf(summary.duration())
+        );
+    }
+
 }

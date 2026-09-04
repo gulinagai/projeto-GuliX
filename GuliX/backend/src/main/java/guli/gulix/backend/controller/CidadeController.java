@@ -4,6 +4,7 @@ import guli.gulix.backend.dto.CidadeCreateDTO;
 import guli.gulix.backend.dto.CidadeResponseDTO;
 import guli.gulix.backend.dto.CidadeUpdateDTO;
 import guli.gulix.backend.service.CidadeService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
@@ -31,7 +32,7 @@ public class CidadeController {
     }
 
     @PostMapping
-    ResponseEntity<CidadeResponseDTO> createNewCidade(@RequestBody CidadeCreateDTO dto) {
+    ResponseEntity<CidadeResponseDTO> createNewCidade(@Valid @RequestBody CidadeCreateDTO dto) {
 
         CidadeResponseDTO novaCidade = cidadeService.createNewCidade(dto);
 
@@ -43,7 +44,7 @@ public class CidadeController {
     }
 
     @PatchMapping("/{cidadeId}")
-    ResponseEntity<CidadeResponseDTO> updateCidadeById(@PathVariable Integer cidadeId, @RequestBody CidadeUpdateDTO dto) {
+    ResponseEntity<CidadeResponseDTO> updateCidadeById(@PathVariable Integer cidadeId,@Valid @RequestBody CidadeUpdateDTO dto) {
 
         return ResponseEntity.ok().body(cidadeService.updateCidadeById(cidadeId, dto));
     }

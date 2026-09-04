@@ -5,16 +5,16 @@ import java.util.concurrent.ThreadLocalRandom;
 public class GeradorCoordenadas {
 
     private static final double RAIO_TERRA_KM = 6371.0;
+    private static final double RAIO_ENDERECO = 10;
 
     public Coordenada gerar(
             double latitudeCentral,
-            double longitudeCentral,
-            double raioKm
+            double longitudeCentral
     ) {
 
         double angulo = ThreadLocalRandom.current().nextDouble(0, 2 * Math.PI);
 
-        double distancia = raioKm * Math.sqrt(
+        double distancia = RAIO_ENDERECO * Math.sqrt(
                 ThreadLocalRandom.current().nextDouble()
         );
 

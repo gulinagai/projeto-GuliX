@@ -4,6 +4,7 @@ import guli.gulix.backend.dto.EstadoCreateDTO;
 import guli.gulix.backend.dto.EstadoResponseDTO;
 import guli.gulix.backend.dto.EstadoUpdateDTO;
 import guli.gulix.backend.service.EstadoService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
@@ -31,7 +32,7 @@ public class EstadoController {
     }
 
     @PostMapping
-    ResponseEntity<EstadoResponseDTO> createNewEstado(@RequestBody EstadoCreateDTO dto) {
+    ResponseEntity<EstadoResponseDTO> createNewEstado(@Valid @RequestBody EstadoCreateDTO dto) {
 
         EstadoResponseDTO novoEstado = estadoService.createNewEstado(dto);
 
@@ -43,7 +44,7 @@ public class EstadoController {
     }
 
     @PatchMapping("/{estadoId}")
-    ResponseEntity<EstadoResponseDTO> updateEstadoById(@PathVariable Integer estadoId, @RequestBody EstadoUpdateDTO dto) {
+    ResponseEntity<EstadoResponseDTO> updateEstadoById(@PathVariable Integer estadoId,@Valid @RequestBody EstadoUpdateDTO dto) {
 
         return ResponseEntity.ok().body(estadoService.updateEstadoById(estadoId, dto));
     }

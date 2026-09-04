@@ -4,9 +4,11 @@ import guli.gulix.backend.dto.CidadeCreateDTO;
 import guli.gulix.backend.dto.CidadeResponseDTO;
 import guli.gulix.backend.dto.CidadeUpdateDTO;
 import guli.gulix.backend.entity.Cidade;
+import guli.gulix.backend.entity.Estado;
 import guli.gulix.backend.exception.RecursoNaoEncontradoException;
 import guli.gulix.backend.mapper.CidadeMapper;
 import guli.gulix.backend.repository.CidadeRepository;
+import guli.gulix.backend.repository.EstadoRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,6 +22,7 @@ public class CidadeServiceImpl implements CidadeService {
 
     private final CidadeRepository cidadeRepository;
     private final CidadeMapper cidadeMapper;
+    private final EstadoRepository estadoRepository;
 
     @Override
     public List<CidadeResponseDTO> getAllCidade() {
@@ -50,6 +53,16 @@ public class CidadeServiceImpl implements CidadeService {
         Cidade cidade = cidadeMapper.toEntity(dto);
 
 
+        Estado estado = estadoRepository.findById(dto.estadoId()).orElseThrow(
+                ()->
+                        new RecursoNaoEncontradoException(
+                                "Estado com id " + dto.estadoId() + " não encontrado"
+                        )
+        );
+
+        cidade.setEstado(estado);
+
+
 
         return cidadeMapper.toDTO(cidadeRepository.save(cidade));
     }
@@ -63,6 +76,17 @@ public class CidadeServiceImpl implements CidadeService {
                                 "Cidade com id " + cidadeId + " não encontrado"
                         )
         );
+
+        if(dto.estadoId() != null) {
+            Estado estado = estadoRepository.findById(dto.estadoId()).orElseThrow(
+                    ()->
+                            new RecursoNaoEncontradoException(
+                                    "Estado com id " + dto.estadoId() + " não encontrado"
+                            )
+            );
+
+            cidadePersistida.setEstado(estado);
+        }
 
         cidadeMapper.updateFromDto(dto, cidadePersistida);
 

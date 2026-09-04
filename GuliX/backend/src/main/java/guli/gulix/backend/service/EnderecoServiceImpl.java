@@ -3,16 +3,22 @@ package guli.gulix.backend.service;
 import guli.gulix.backend.dto.EnderecoCreateDTO;
 import guli.gulix.backend.dto.EnderecoResponseDTO;
 import guli.gulix.backend.dto.EnderecoUpdateDTO;
+import guli.gulix.backend.entity.Cidade;
 import guli.gulix.backend.entity.Endereco;
 import guli.gulix.backend.entity.Usuario;
 import guli.gulix.backend.exception.RecursoNaoEncontradoException;
 import guli.gulix.backend.exception.RegraNegocioException;
+import guli.gulix.backend.gateway.openrouteservice.OpenRouteServiceGateway;
+import guli.gulix.backend.geographic.Coordenada;
+import guli.gulix.backend.geographic.GeradorCoordenadas;
 import guli.gulix.backend.mapper.EnderecoMapper;
+import guli.gulix.backend.repository.CidadeRepository;
 import guli.gulix.backend.repository.EnderecoRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -22,6 +28,8 @@ public class EnderecoServiceImpl implements EnderecoService{
 
     private final EnderecoRepository enderecoRepository;
     private final EnderecoMapper enderecoMapper;
+    private final CidadeRepository cidadeRepository;
+    private final OpenRouteServiceGateway openRouteServiceGateway;
 
     @Override
     @Transactional(readOnly = true)
@@ -54,16 +62,27 @@ public class EnderecoServiceImpl implements EnderecoService{
 
          // gera coordenadas
 
-        montaCoordenadas();
+        Coordenada preCoordenada = buscaCoordenada(enderecoRequest.getCidade());
+        GeradorCoordenadas geradorCoordenadas = new GeradorCoordenadas();
+        Coordenada novaCoordenadaAleatoria = geradorCoordenadas.gerar(preCoordenada.latitude(), preCoordenada.longitude());
+
+        // coordenada certa, precisa persistir no banco
+        Coordenada coordenadaSnap = openRouteServiceGateway.snap(novaCoordenadaAleatoria);
+
+        endereco.setLatitude(BigDecimal.valueOf(coordenadaSnap.latitude()));
+        endereco.setLongitude(BigDecimal.valueOf(coordenadaSnap.longitude()));
 
         return enderecoMapper.toDTO(enderecoRepository.save(endereco));
 
     }
 
-    private void montaCoordenadas() {
+    private Coordenada buscaCoordenada(String cidade) {
+        Cidade cidadePersistida = cidadeRepository.findByNome(cidade)
+                .orElseThrow(() -> new RecursoNaoEncontradoException(
+                        "Cidade não encontrada ou não cadastrada"
+                ));
 
-
-
+        return new Coordenada(cidadePersistida.getLatitudeCentral().doubleValue(), cidadePersistida.getLongitudeCentral().doubleValue());
     }
 
     @Override

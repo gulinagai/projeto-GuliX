@@ -8,6 +8,7 @@ import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Getter
@@ -43,6 +44,12 @@ public class Endereco {
 
     @Column(nullable = false)
     private boolean principal;
+
+    @Column(nullable = false)
+    private BigDecimal latitude;
+
+    @Column(nullable = false)
+    private BigDecimal longitude;
 
     @CreationTimestamp
     @Column(name = "criado_em", updatable = false)

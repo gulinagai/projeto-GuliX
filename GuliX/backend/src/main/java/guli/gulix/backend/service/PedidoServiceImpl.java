@@ -99,7 +99,7 @@ public class PedidoServiceImpl implements PedidoService {
         // buscar para ver se o endereço passado para entrega existe no banco
 
         Endereco enderecoExiste = enderecoRepository.findByIdAndUsuario(pedidoCreateDTO.getEnderecoId(), usuario)
-                .orElseThrow(() -> new RecursoNaoEncontradoException("Endereço não encontrado"));
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Endereço não encontrado ou não cadastrado"));
 
         // Mapping Pedido
 

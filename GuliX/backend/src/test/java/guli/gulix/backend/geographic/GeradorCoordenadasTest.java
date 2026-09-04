@@ -17,8 +17,7 @@ class GeradorCoordenadasTest {
 
         Coordenada coordenada = gerador.gerar(
                 latitudeCentral,
-                longitudeCentral,
-                raioKm
+                longitudeCentral
         );
 
         double distancia = calcularDistanciaKm(
