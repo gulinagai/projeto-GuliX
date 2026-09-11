@@ -9,6 +9,7 @@ import guli.gulix.backend.entity.enums.StatusPagamento;
 import guli.gulix.backend.entity.enums.StatusPedido;
 import guli.gulix.backend.exception.RecursoNaoEncontradoException;
 import guli.gulix.backend.exception.RegraNegocioException;
+import guli.gulix.backend.geographic.Coordenada;
 import guli.gulix.backend.mapper.PedidoMapper;
 import guli.gulix.backend.repository.CarrinhoRepository;
 import guli.gulix.backend.repository.EnderecoRepository;
@@ -18,6 +19,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -32,6 +34,7 @@ public class PedidoServiceImpl implements PedidoService {
     private final CarrinhoService carrinhoService;
     private final PagamentoService pagamentoService;
     private final EstoqueService estoqueService;
+    private final CalculoFreteService calculoFreteService;
 
 
     // USER
@@ -105,7 +108,19 @@ public class PedidoServiceImpl implements PedidoService {
 
         newPedido.setUsuario(carrinho.getUsuario());
         newPedido.setStatusPedido(StatusPedido.PENDENTE);
-        newPedido.setTotal(carrinhoService.calcularTotal(carrinho));
+
+        BigDecimal subtotal = carrinhoService.calcularTotal(carrinho);
+
+        newPedido.setSubtotal(subtotal);
+
+        BigDecimal frete = calculoFreteService.calcularFrete(
+                new Coordenada(enderecoExiste.getLatitude().doubleValue(), enderecoExiste.getLongitude().doubleValue()),
+                enderecoExiste.getEstado()
+        );
+
+        newPedido.setValorFrete(frete);
+
+        newPedido.setTotal(subtotal.add(frete));
 
         EnderecoEntrega enderecoEntrega = new EnderecoEntrega();
 
@@ -114,6 +129,8 @@ public class PedidoServiceImpl implements PedidoService {
         enderecoEntrega.setCep(enderecoExiste.getCep());
         enderecoEntrega.setCidade(enderecoExiste.getCidade());
         enderecoEntrega.setEstado(enderecoExiste.getEstado());
+        enderecoEntrega.setLatitude(enderecoExiste.getLatitude());
+        enderecoEntrega.setLongitude(enderecoExiste.getLongitude());
 
         newPedido.setEnderecoEntrega(enderecoEntrega);
 
@@ -136,6 +153,7 @@ public class PedidoServiceImpl implements PedidoService {
         ).toList();
 
         newPedido.setItens(itensPedido);
+
 
 
         Pedido saved = pedidoRepository.save(newPedido);

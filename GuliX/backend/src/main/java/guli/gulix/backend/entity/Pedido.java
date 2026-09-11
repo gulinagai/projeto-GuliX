@@ -34,7 +34,15 @@ public class Pedido {
     private StatusPedido statusPedido;
 
     @Column(nullable = false, precision = 10, scale = 2)
+    private BigDecimal subtotal;
+
+    @Column(name = "valor_frete", nullable = false, precision = 10, scale = 2)
+    private BigDecimal valorFrete;
+
+    @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal total;
+
+
 
     @CreationTimestamp
     @Column(name = "criado_em", updatable = false, nullable = false)

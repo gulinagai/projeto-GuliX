@@ -5,12 +5,18 @@ import guli.gulix.backend.geographic.Coordenada;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 
 import java.math.BigDecimal;
 import java.util.List;
 
 @Component
 public class OpenRouteServiceGatewayImpl implements OpenRouteServiceGateway {
+
+    private static final Logger log =
+            LoggerFactory.getLogger(OpenRouteServiceGatewayImpl.class);
 
     private final RestClient restClient;
     private final String apiKey;
@@ -31,15 +37,17 @@ public class OpenRouteServiceGatewayImpl implements OpenRouteServiceGateway {
                         coordenada.longitude(),
                         coordenada.latitude()
                 )),
-                300
+                5000
         );
 
         SnapResponseDTO response = restClient.post()
-                .uri("/ors/v2/snap/driving-car/json")
+                .uri("/openrouteservice/v2/snap/driving-car/json")
                 .header("Authorization", apiKey)
                 .body(request)
                 .retrieve()
                 .body(SnapResponseDTO.class);
+
+        log.info("Resposta do OpenRouteService: {}", response);
 
         List<Double> location = response.locations()
                 .getFirst()
@@ -71,7 +79,7 @@ public class OpenRouteServiceGatewayImpl implements OpenRouteServiceGateway {
         );
 
         DirectionsResponseDTO response = restClient.post()
-                .uri("/ors/v2/directions/driving-car/json")
+                .uri("/openrouteservice/v2/directions/driving-car/json")
                 .header("Authorization", apiKey)
                 .body(request)
                 .retrieve()

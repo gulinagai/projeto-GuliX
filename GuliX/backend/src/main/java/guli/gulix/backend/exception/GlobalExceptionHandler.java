@@ -3,6 +3,9 @@ package guli.gulix.backend.exception;
 import guli.gulix.backend.dto.ErrorResponseDTO;
 import guli.gulix.backend.dto.ValidationErrorResponseDTO;
 import jakarta.servlet.http.HttpServletRequest;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -23,6 +26,9 @@ import java.util.Map;
   */
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
+    private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
+
 
     /**
      * Trata situações em que o recurso solicitado não foi encontrado.
@@ -210,8 +216,16 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponseDTO> handleGeneric(
+            Exception ex,
             HttpServletRequest request
     ) {
+
+        log.error(
+                "Erro inesperado ao processar requisição {} {}",
+                request.getMethod(),
+                request.getRequestURI(),
+                ex
+        );
 
         HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
 

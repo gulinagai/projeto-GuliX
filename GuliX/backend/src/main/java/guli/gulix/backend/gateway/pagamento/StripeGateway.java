@@ -103,8 +103,6 @@ public class StripeGateway {
 
             case CARTAO_CREDITO -> SessionCreateParams.PaymentMethodType.CARD;
 
-            case PIX -> SessionCreateParams.PaymentMethodType.PIX;
-
             case BOLETO -> SessionCreateParams.PaymentMethodType.BOLETO;
         };
 

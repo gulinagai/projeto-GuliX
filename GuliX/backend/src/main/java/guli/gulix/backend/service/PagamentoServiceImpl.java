@@ -52,7 +52,10 @@ public class PagamentoServiceImpl implements PagamentoService {
 
         pagamento.setGateway(GatewayPagamento.STRIPE);
 
-        // Valor original do pedido
+        // Valor original do pedido: subtotal + frete
+        // Valor final do pedido: (subtotal + frete) - desconto (caso Boleto)
+        // ou
+        // Valor final do pedido: (subtotal + frete) + juros  (caso Cartão de Crédito)
         pagamento.setValorOriginal(pedido.getTotal());
 
         // Calcula o desconto de acordo com o metodo de pagamento
@@ -66,6 +69,7 @@ public class PagamentoServiceImpl implements PagamentoService {
         // Valor após o desconto
         BigDecimal valorBase = pagamento.getValorOriginal()
                 .subtract(pagamento.getDesconto());
+
 
         if (pagamento.getMetodoPagamento()
                 == MetodoPagamento.CARTAO_CREDITO) {
@@ -105,12 +109,14 @@ public class PagamentoServiceImpl implements PagamentoService {
             pagamento.setNumeroParcelas(null);
             pagamento.setValorParcela(null);
 
-            // PIX/Boleto não possuem juros
+            // Boleto não possui juros
             pagamento.setPercentualJuros(BigDecimal.ZERO);
             pagamento.setValorJuros(BigDecimal.ZERO);
 
             pagamento.setValorFinal(valorBase);
         }
+
+
 
         Pagamento saved = pagamentoRepository.save(pagamento);
 
@@ -225,8 +231,7 @@ public class PagamentoServiceImpl implements PagamentoService {
             MetodoPagamento metodoPagamento
     ) {
 
-        if (metodoPagamento == MetodoPagamento.BOLETO
-                || metodoPagamento == MetodoPagamento.PIX) {
+        if (metodoPagamento == MetodoPagamento.BOLETO) {
 
             BigDecimal descontoPorcentagem = BigDecimal.valueOf(10);
 
@@ -261,36 +266,6 @@ public class PagamentoServiceImpl implements PagamentoService {
         return pagamentoMapper.toDTO(pagamento);
     }
 
-    @Override
-    public PagamentoResponseDTO confirmarPagamento(
-            Integer pagamentoId,
-            Usuario usuario
-    ) {
-
-        Pagamento pagamento = findPagamentoOrThrow(pagamentoId);
-
-        Pedido pedido = pagamento.getPedido();
-
-        validateAccess(pedido, usuario);
-
-        if (pagamento.getStatusPagamento()
-                == StatusPagamento.CONFIRMADO) {
-
-            throw new RegraNegocioException(
-                    "Pagamento já está confirmado"
-            );
-        }
-
-        pagamento.setStatusPagamento(
-                StatusPagamento.CONFIRMADO
-        );
-
-        pedido.setStatusPedido(
-                StatusPedido.APROVADO
-        );
-
-        return pagamentoMapper.toDTO(pagamento);
-    }
 
     private Pagamento findPagamentoOrThrow(Integer pagamentoId) {
 

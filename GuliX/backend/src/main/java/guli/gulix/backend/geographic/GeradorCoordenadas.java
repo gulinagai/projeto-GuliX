@@ -5,7 +5,7 @@ import java.util.concurrent.ThreadLocalRandom;
 public class GeradorCoordenadas {
 
     private static final double RAIO_TERRA_KM = 6371.0;
-    private static final double RAIO_ENDERECO = 10;
+    private static final double RAIO_ENDERECO = 5;
 
     public Coordenada gerar(
             double latitudeCentral,
