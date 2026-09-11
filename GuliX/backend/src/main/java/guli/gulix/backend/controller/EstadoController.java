@@ -40,7 +40,7 @@ public class EstadoController {
 
         headers.add("Location", "/api/v1/estados/" + novoEstado.id().toString());
 
-        return ResponseEntity.ok().body(estadoService.createNewEstado(dto));
+        return ResponseEntity.ok().body(novoEstado);
     }
 
     @PatchMapping("/{estadoId}")

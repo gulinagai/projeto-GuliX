@@ -40,7 +40,7 @@ public class PoliticaFreteController {
 
         headers.add("Location", "/api/v1/politicaFretes/" + novaPoliticaFrete.id().toString());
 
-        return ResponseEntity.ok().body(politicaFreteService.createNewPoliticaFrete(dto));
+        return ResponseEntity.ok().body(novaPoliticaFrete);
     }
 
     @PatchMapping("/{politicaFreteId}")

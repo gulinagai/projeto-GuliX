@@ -40,7 +40,7 @@ public class CidadeController {
 
         headers.add("Location", "/api/v1/cidades/" + novaCidade.id().toString());
 
-        return ResponseEntity.ok().body(cidadeService.createNewCidade(dto));
+        return ResponseEntity.ok().body(novaCidade);
     }
 
     @PatchMapping("/{cidadeId}")
