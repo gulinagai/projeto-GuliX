@@ -16,40 +16,25 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "enderecos")
-public class Endereco {
+@Table(name = "cidades")
+public class Cidade {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
+    @Column(nullable = false)
+    private String nome;
+
     @ManyToOne
-    @JoinColumn(name = "usuario_id", nullable = false)
-    private Usuario usuario;
+    @JoinColumn(name = "estado_id", nullable = false)
+    private Estado estado;
 
     @Column(nullable = false)
-    private String rua;
+    private BigDecimal latitudeCentral;
 
     @Column(nullable = false)
-    private String numero;
-
-    @Column(nullable = false)
-    private String cidade;
-
-    @Column(nullable = false)
-    private String estado;
-
-    @Column(nullable = false)
-    private String cep;
-
-    @Column(nullable = false)
-    private boolean principal;
-
-    @Column(nullable = false)
-    private BigDecimal latitude;
-
-    @Column(nullable = false)
-    private BigDecimal longitude;
+    private BigDecimal longitudeCentral;
 
     @CreationTimestamp
     @Column(name = "criado_em", updatable = false)

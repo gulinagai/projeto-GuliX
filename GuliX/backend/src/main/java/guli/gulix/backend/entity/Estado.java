@@ -8,7 +8,6 @@ import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Getter
@@ -16,40 +15,18 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "enderecos")
-public class Endereco {
+@Table(name = "estados")
+public class Estado {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @ManyToOne
-    @JoinColumn(name = "usuario_id", nullable = false)
-    private Usuario usuario;
+    @Column(nullable = false)
+    private String nome;
 
     @Column(nullable = false)
-    private String rua;
-
-    @Column(nullable = false)
-    private String numero;
-
-    @Column(nullable = false)
-    private String cidade;
-
-    @Column(nullable = false)
-    private String estado;
-
-    @Column(nullable = false)
-    private String cep;
-
-    @Column(nullable = false)
-    private boolean principal;
-
-    @Column(nullable = false)
-    private BigDecimal latitude;
-
-    @Column(nullable = false)
-    private BigDecimal longitude;
+    private String sigla;
 
     @CreationTimestamp
     @Column(name = "criado_em", updatable = false)

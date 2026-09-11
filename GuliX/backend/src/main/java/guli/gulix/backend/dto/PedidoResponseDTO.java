@@ -1,5 +1,6 @@
 package guli.gulix.backend.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import guli.gulix.backend.entity.EnderecoEntrega;
 import guli.gulix.backend.entity.ItemPedido;
 import guli.gulix.backend.entity.Usuario;
@@ -26,16 +27,23 @@ public class PedidoResponseDTO {
 
     private StatusPedido statusPedido;
 
-    private BigDecimal total;
-
-    private LocalDateTime criadoEm;
-
-    private LocalDateTime atualizadoEm;
-
     private EnderecoEntregaDTO enderecoEntrega;
 
     private List<ItemPedidoResponseDTO> itens;
 
     private PagamentoResponseDTO pagamento;
+
+    @JsonFormat(shape = JsonFormat.Shape.NUMBER, pattern = "0.00")
+    private BigDecimal valorFrete;
+
+    @JsonFormat(shape = JsonFormat.Shape.NUMBER, pattern = "0.00")
+    private BigDecimal subtotal;
+
+    @JsonFormat(shape = JsonFormat.Shape.NUMBER, pattern = "0.00")
+    private BigDecimal total;
+
+    private LocalDateTime criadoEm;
+
+    private LocalDateTime atualizadoEm;
 
 }

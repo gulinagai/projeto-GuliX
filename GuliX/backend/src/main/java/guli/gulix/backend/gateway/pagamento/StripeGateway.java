@@ -1,4 +1,4 @@
-package guli.gulix.backend.gateway;
+package guli.gulix.backend.gateway.pagamento;
 
 import com.stripe.StripeClient;
 import com.stripe.model.checkout.Session;
@@ -102,8 +102,6 @@ public class StripeGateway {
         return switch (metodoPagamento) {
 
             case CARTAO_CREDITO -> SessionCreateParams.PaymentMethodType.CARD;
-
-            case PIX -> SessionCreateParams.PaymentMethodType.PIX;
 
             case BOLETO -> SessionCreateParams.PaymentMethodType.BOLETO;
         };

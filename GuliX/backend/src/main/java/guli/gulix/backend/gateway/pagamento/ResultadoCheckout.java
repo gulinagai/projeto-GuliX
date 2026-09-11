@@ -1,4 +1,4 @@
-package guli.gulix.backend.gateway;
+package guli.gulix.backend.gateway.pagamento;
 
 
 import lombok.Getter;
