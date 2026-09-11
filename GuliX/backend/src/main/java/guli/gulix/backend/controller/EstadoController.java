@@ -7,6 +7,7 @@ import guli.gulix.backend.service.EstadoService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -40,7 +41,7 @@ public class EstadoController {
 
         headers.add("Location", "/api/v1/estados/" + novoEstado.id().toString());
 
-        return ResponseEntity.ok().body(novoEstado);
+        return ResponseEntity.status(HttpStatus.CREATED).headers(headers).body(novoEstado);
     }
 
     @PatchMapping("/{estadoId}")
