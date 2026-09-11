@@ -26,16 +26,20 @@ public class PedidoResponseDTO {
 
     private StatusPedido statusPedido;
 
-    private BigDecimal total;
-
-    private LocalDateTime criadoEm;
-
-    private LocalDateTime atualizadoEm;
-
     private EnderecoEntregaDTO enderecoEntrega;
 
     private List<ItemPedidoResponseDTO> itens;
 
     private PagamentoResponseDTO pagamento;
+
+    private BigDecimal valorFrete;
+
+    private BigDecimal subtotal;
+
+    private BigDecimal total;
+
+    private LocalDateTime criadoEm;
+
+    private LocalDateTime atualizadoEm;
 
 }

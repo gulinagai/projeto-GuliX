@@ -42,8 +42,6 @@ public class Pedido {
     @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal total;
 
-
-
     @CreationTimestamp
     @Column(name = "criado_em", updatable = false, nullable = false)
     private LocalDateTime criadoEm;
@@ -51,7 +49,6 @@ public class Pedido {
     @UpdateTimestamp
     @Column(name = "atualizado_em")
     private LocalDateTime atualizadoEm;
-
 
     @Embedded
     @AttributeOverrides({
