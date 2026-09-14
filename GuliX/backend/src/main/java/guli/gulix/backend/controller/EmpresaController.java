@@ -7,6 +7,7 @@ import guli.gulix.backend.service.EmpresaService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 
@@ -23,7 +24,7 @@ public class EmpresaController {
         return ResponseEntity.ok().body(empresaService.getEmpresa());
     }
 
-
+    @PreAuthorize("hasRole('ADMIN')")
     @PatchMapping("/{empresaId}")
     ResponseEntity<EmpresaResponseDTO> updateEmpresa(@Valid @RequestBody EmpresaUpdateDTO dto) {
 

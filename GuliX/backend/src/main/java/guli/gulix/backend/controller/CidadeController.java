@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -32,6 +33,7 @@ public class CidadeController {
         return ResponseEntity.ok().body(cidadeService.getCidadeById(cidadeId));
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
     ResponseEntity<CidadeResponseDTO> createNewCidade(@Valid @RequestBody CidadeCreateDTO dto) {
 
@@ -44,12 +46,14 @@ public class CidadeController {
         return ResponseEntity.status(HttpStatus.CREATED).headers(headers).body(novaCidade);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PatchMapping("/{cidadeId}")
     ResponseEntity<CidadeResponseDTO> updateCidadeById(@PathVariable Integer cidadeId,@Valid @RequestBody CidadeUpdateDTO dto) {
 
         return ResponseEntity.ok().body(cidadeService.updateCidadeById(cidadeId, dto));
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{cidadeId}")
     ResponseEntity<Void> deleteCidadeById(@PathVariable Integer cidadeId) {
 

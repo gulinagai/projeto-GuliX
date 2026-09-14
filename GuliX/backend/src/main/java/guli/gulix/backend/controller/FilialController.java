@@ -7,6 +7,7 @@ import guli.gulix.backend.service.FilialService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 
@@ -23,7 +24,7 @@ public class FilialController {
         return ResponseEntity.ok().body(filialService.getFilial());
     }
 
-
+    @PreAuthorize("hasRole('ADMIN')")
     @PatchMapping("/{filialId}")
     ResponseEntity<FilialResponseDTO> updateFilial(@Valid @RequestBody FilialUpdateDTO dto) {
 
